@@ -16,6 +16,6 @@ Proyecto desarrollado para el **Laboratorio 3 de TypeScript Avanzado**. Esta apl
 - `npx tsc --noEmit`: Ejecuta el verificador de tipos (Debe arrojar 0 errores).
 
 ## 📂 Documentación Adicional
-Puedes encontrar un análisis detallado de la arquitectura y el uso de tipos en el archivo:
+Puedes encontrar un análisis detallado del taskflow REACT, la bitacora de la arquitectura y el uso de tipos, y concluisones ir al archivo:
 `docs/arquitectura-final.md`
 ```
