@@ -81,4 +81,16 @@ function App() {
   )
 }
 
+function App() {
+  return (
+    <div className="flex h-screen items-center justify-center bg-gray-900">
+      <div className="rounded-xl bg-orange-500 p-10 shadow-2xl">
+        <h1 className="text-3xl font-bold text-white">
+          🔥 HammerFlow Forge: Tailwind funcionando
+        </h1>
+      </div>
+    </div>
+  )
+}
+
 export default App
