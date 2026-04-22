@@ -1,3 +1,33 @@
+# Bitacora clonar vieja arquitectura del lab/taskflow 4-react
+Para ahorrar tiempo "clonamos" vieja arquitectura en el nuevo proyecto
+
+1. Paso previo, creamos la carpeta del proyecto- "idea Negocio"
+2. Viculamos con github.
+    Creamos repositorio en git y vinculamos desde terminal.
+        Bash:
+        git remote add origin https:(dirección del repositorio en github)
+
+3. Creamos un README.md y hacemos comit
+        Bash:
+        git commit -m "first commit"
+4. Cambiamos el "nombre" de master a main del branch principal. Y hacemos primer push
+        Bash:
+        git branch -M main
+        git push -u main
+
+5. Vinculamos el viejo repositorio. (En nuestro SCE, VS code)
+Para hacer la copia del repositorio "viejo" (taskflow4-react) hacia la carpeta ya creada y abierta en VS code y ya vinculada a Github.
+    Primero. Añadimos el repo. viejo como "remoto temporal"
+        Bash
+        git remote add viejo-repo https:(dirección del repositorio viejo que queremos copiar)
+    Segundo. "Traemos el repositorio viejo con un pull.
+        Bash
+        git pull viejo-repo main --allow-unrealte-histories
+    Tercero. Opcional, limpiamos el "remoto temporal"
+        Bash
+        git remote remove viejo-repo
+
+
 # Bitacora Laboratorio 3 y Conclusiones 
 
 ## Paso 0.  "Crear" carpeta de lógica
@@ -364,9 +394,10 @@ Al integrar Luxon con sus definiciones de tipo (`@types/luxon`), eliminamos la a
 - Nuestra función `obtenerDiasDesde` asegura mediante tipos que la entrada es un `string` (ISO) y la salida siempre un `number`, manejando internamente los posibles valores `NaN` o nulos de la librería mediante cortocircuitos (`|| 0`), algo que en JS puro suele causar errores matemáticos difíciles de rastrear.
 
 
-#### Conclusiones. El valor de TypeScript en el Ciclo de Vida del Software
+### Conclusiones. El valor de TypeScript en el Ciclo de Vida del Software
 
 Este proyecto demuestra que el uso de tipos avanzados no es solo una capa decorativa, sino una red de seguridad crítica.
+
 Dispone de **mantenibilidad**: Gracias al Análisis Exhaustivo.
 La abstracción de **calidad**: Gracias a la "DataTable<T>" genérica elimina la necesidad de duplicar lógica para diferentes tipos de datos.
 Y la revención de errores en "Runtime": Gracias al uso de "Partial<T>" y la integración estricta de **Luxon** permiten manejar la incertidumbre de la entrada de datos del usuario y de librerías externas sin el riesgo de errores.
