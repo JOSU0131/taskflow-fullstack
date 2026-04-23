@@ -1,96 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
-
-// 1. Lógica del Módulo 2
-import { Alumno, generarReporte } from './logic/matriculas';
-
-// 2. Componentes y Utilidades del Módulo 3
-import { DataTable } from './components/DataTable';
-import { obtenerDiasDesde } from './utils/dateUtils';
-
-// Interfaz para la Galería (Requisito de datos complejos)
-interface Obra {
-  id: string;
-  titulo: string;
-  artista: string;
-  fechaIngreso: string;
-}
-
-const misAlumnos: Alumno[] = [
-  { id: "1", nombre: "Daniel", estado: { tipo: "ACTIVA", asignaturas: ["TypeScript", "React"] } },
-  { id: "2", nombre: "Josu", estado: { tipo: "FINALIZADA", notaMedia: 9.5 } }
-];
-
-const misObras: Obra[] = [
-  { id: "OB-01", titulo: "Noche Estrellada", artista: "Van Gogh", fechaIngreso: "2023-01-10" },
-  { id: "OB-02", titulo: "Guernica", artista: "Picasso", fechaIngreso: "2024-02-15" }
-];
-
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        
-        <div>
-          <h1>TaskFlow: Panel de Control</h1>
-          
-          {/* SECCIÓN ALUMNOS (Módulo 2 + never) */}
-          <div style={{ textAlign: 'left', background: '#222', padding: '20px', borderRadius: '8px', marginTop: '20px' }}>
-            <h3>👥 Estado de Alumnos</h3>
-            {misAlumnos.map(alumno => (
-              <div key={alumno.id} style={{ marginBottom: '10px', borderBottom: '1px solid #444' }}>
-                <p><strong>{alumno.nombre}</strong></p>
-                <p style={{ color: '#646cff' }}>{generarReporte(alumno.estado)}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* SECCIÓN TABLA GENÉRICA (Módulo 3: Genéricos + Partial) */}
-          <DataTable 
-            titulo="🏛️ Inventario Galería"
-            datos={misObras}
-            columnas={[
-              { clave: 'titulo', etiqueta: 'Obra' },
-              { clave: 'artista', etiqueta: 'Autor' }
-            ]}
-          />
-
-          {/* SECCIÓN LUXON (Librería externa) */}
-          <p style={{ fontSize: '0.9rem', color: '#888' }}>
-            Info: La primera obra llegó hace {obtenerDiasDesde(misObras[0].fechaIngreso)} días.
-          </p>
-        </div>
-        
-        <button className="counter" onClick={() => setCount((c) => c + 1)} style={{ marginTop: '20px' }}>
-          Interacciones: {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-    </>
-  )
-}
+import { MiniaturaCard } from './components/MiniaturaCard';
+import { PRODUCTOS_MOCK } from './data/mockData';
 
 function App() {
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-900">
-      <div className="rounded-xl bg-orange-500 p-10 shadow-2xl">
-        <h1 className="text-3xl font-bold text-white">
-          🔥 HammerFlow Forge: Tailwind funcionando
+    <div className="min-h-screen bg-slate-900 text-slate-100 p-8">
+      {/* Encabezado del Marketplace */}
+      <header className="max-w-7xl mx-auto mb-12">
+        <h1 className="text-4xl font-black tracking-tighter text-white italic">
+          HAMMER<span className="text-orange-500">FLOW</span> FORGE
         </h1>
-      </div>
+        <p className="text-slate-400 mt-2 font-medium">
+          El mercado definitivo para artistas de miniaturas y wargames.
+        </p>
+      </header>
+
+      {/* Grid de Productos */}
+      <main className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {PRODUCTOS_MOCK.map((item) => (
+            <MiniaturaCard key={item.id} item={item} />
+          ))}
+        </div>
+      </main>
+
+      {/* Footer simple */}
+      <footer className="max-w-7xl mx-auto mt-20 pt-8 border-t border-slate-800 text-center text-slate-500 text-sm">
+        &copy; {new Date().getFullYear()} HammerFlow Forge - Panel de Control de Artista
+      </footer>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

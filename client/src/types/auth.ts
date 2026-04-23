@@ -1,0 +1,1 @@
+// Para tipos de usuario (Artista, Comprador)
