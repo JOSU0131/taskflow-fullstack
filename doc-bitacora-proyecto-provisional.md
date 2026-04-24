@@ -177,3 +177,39 @@ Modificando "App.tsx" ir docs/hooks.md
 
 # Paso 8: Context y estado global
 Ir a docs/context.md
+
+# Paso 8.2: Recordatior despliegue Vercel
+
+1. Instalación de Vercel CLI
+Abre la terminal integrada en VS Code (puedes usar Ctrl + Ñ) y escribe:
+
+Bash
+    npm i -g vercel
+    
+    Nota: Si te da error de permisos en Mac/Linux, usa sudo npm i -g vercel.
+
+2. Login y Vinculación
+Una vez instalado, ejecuta estos comandos en orden:
+
+vercel login: Te pedirá elegir un método (elige GitHub). Se abrirá una pestaña en tu navegador para confirmar.
+vercel: Al escribir esto solo, empezará el asistente de vinculación:
+
+A las preguntas: 
+    Set up and deploy? yes
+
+    Which scope? (Tu nombre de usuario)
+
+    Link to existing project? yes (porque ya lo creaste en la web).
+
+    What's the name of your existing project? Escribe el nombre que sale en tu repositorio github.
+    
+    Would you like to pull environment variables now? yes
+    
+Siguientes Pasos
+    Despliegue final: Una vez termine, ejecuta el comando vercel --prod en tu terminal. Esto subirá tu código actual (con el nuevo Hook useProductos y la persistencia de localStorage) directamente a la URL de producción.
+
+    Verifica el 404: Si tras el despliegue sigues viendo el error 404, recuerda crear el archivo vercel.json en la raíz de tu proyecto con el código de "rewrites"
+        JSON
+            {
+            "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+            }
