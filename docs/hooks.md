@@ -1,8 +1,10 @@
 
 # 1. El Plan de Acción
+Inicialmente, la gestión de la interactividad se planteó directamente en App.tsx. El objetivo era permitir al usuario filtrar las miniaturas por categoría mediante una interfaz reactiva.
+
 Vamos a añadir un estado en App.tsx que guarde qué categoría ha seleccionado el usuario. Luego, filtraremos la lista de PRODUCTOS_MOCK antes de pasársela al GridProductos
 
-
+## Hooks Fundamentales Utilizados:
 **useState**: Lo utilizamos para controlar la interactividad. Permite que React "recuerde" qué categoría ha pulsado el usuario y repinte la interfaz automáticamente al cambiar.
 Una especie de filtrado
 
@@ -56,13 +58,12 @@ En function
 
 
 # 2. Añadir Custom Hook y usar useEffect
-Creamo un efecto de "FORJANDO MINIATURAS"
+Para elevar la calidad del código, encapsulamos toda la lógica en un Custom Hook.
 
 NOTA:
 *Un Custom Hook es, en esencia, una función de JavaScript/TypeScript que utiliza otros Hooks de React (como useState, useEffect o useMemo) para encapsular una lógica específica.*
 
-
-En este paso:
+Responsabilidades del Hook (en este paso):
 
 useProductos (Custom Hook): Reúne toda la lógica de gestión de datos, estados de carga y filtrado en una sola función reutilizable, manteniendo los componentes visuales limpios.
     

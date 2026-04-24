@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { PRODUCTOS_MOCK } from '../data/mockData';
-import type { HammerItem, Categoria } from '../types/miniatures';
+import type { Categoria } from '../types/miniatures';
 
 export const useProductos = () => {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<Categoria | null>(null);
