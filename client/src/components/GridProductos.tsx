@@ -1,4 +1,4 @@
-import { HammerItem } from '../types/miniatures';
+import type { HammerItem } from '../types/miniatures';
 import { MiniaturaCard } from './MiniaturaCard';
 
 interface GridProps {

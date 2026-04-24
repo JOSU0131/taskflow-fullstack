@@ -1,6 +1,5 @@
 
 import { DateTime } from 'luxon';
-import type { HammerItem } from '../types/miniatures';
 
 export const obtenerEstadoMecenazgo = (fechaFin: string): string => {
   const fin = DateTime.fromISO(fechaFin);

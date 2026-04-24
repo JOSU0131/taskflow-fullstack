@@ -204,7 +204,7 @@ A las preguntas:
     What's the name of your existing project? Escribe el nombre que sale en tu repositorio github.
     
     Would you like to pull environment variables now? yes
-    
+
 Siguientes Pasos
     Despliegue final: Una vez termine, ejecuta el comando vercel --prod en tu terminal. Esto subirá tu código actual (con el nuevo Hook useProductos y la persistencia de localStorage) directamente a la URL de producción.
 
@@ -213,3 +213,25 @@ Siguientes Pasos
             {
             "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
             }
+
+## Fallo en vercel
+El error Command "npm run build" exited with 2 que viste anteriormente se debe exactamente a estos dos fallos de TypeScript. El compilador es estricto y, al detectar errores, detiene la generación de la carpeta dist, lo que impide que Vercel pueda desplegar nada.
+
+Aquí tienes la solución para corregir ambos archivos y que el build pase sin problemas:
+
+1. Corregir src/components/GridProductos.tsx
+
+    El error TS1484 ocurre porque tu configuración de TypeScript (verbatimModuleSyntax) exige que los tipos se importen explícitamente como tales.
+
+    Cambia la línea 1 de: añadimos **type** 
+    TypeScript
+        import type { HammerItem } from '../types/miniatures';
+
+2. Corregir src/logic/hammerLogic.ts
+    El error TS6133 indica que estás importando HammerItem pero no lo estás usando en ninguna parte de ese archivo.
+
+    Solución: * Borramos la línea  por completo si no vas a usar ese tipo en la lógica de ese archivo.
+    linea 3 "import type { HammerItem } from '../types/miniatures';"
+
+    MOTIVO: ¿Por qué se bloquea el despliegue?
+    En entornos profesionales, se activa una regla llamada noUnusedLocals. Esta regla considera que tener código que no se usa es "basura" que ocupa memoria y confunde a otros programadores. Por eso, aunque el código funcione, TypeScript se niega a hacer el build hasta que lo limpies.
