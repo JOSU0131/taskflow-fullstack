@@ -173,4 +173,7 @@ a
 
 
 # Paso 7: Interactividad y Filtros
-Modificando "App.tsx" ir doc/hooks.md
+Modificando "App.tsx" ir docs/hooks.md
+
+# Paso 8: Context y estado global
+Ir a docs/context.md
