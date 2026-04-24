@@ -11,8 +11,8 @@ Integrando React, TypeScript, Node.js/Express y metodologías Agile.
 ## 🚀 Enlaces del Proyecto
 
 * **Tablero de Organización (Trello):** [https://trello.com/b/LeLvBjuK/my-trello-board]
-* **Despliegue Frontend (Vercel):** [Enlace al deploy]
-* **API / Backend:** [Enlace al server si aplica]
+* **Despliegue Frontend (Vercel):** [https://taskflow-fullstack-psi.vercel.app/]
+
 
 ---
 
