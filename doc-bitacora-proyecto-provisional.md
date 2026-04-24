@@ -113,7 +113,6 @@ Crea src/data/mockData.ts para tener algo que mostrar en pantalla antes de conec
 
 
 
-
 # Paso 6: Desarrollo de componentes
 Aquí vemos "cómo se ve la interfaz".
 
@@ -123,15 +122,19 @@ Creamos el archivo en src/components/MiniaturaCard.tsx:
 
 Componente agnóstico: A la Card no le importa de dónde vienen los datos (si de un mock o de una API futura), solo sabe pintarlos.
 
-Uso de la lógica: Fíjate que en el caso de MECENAZGO, estamos llamando a las funciones de hammerLogic.ts que creamos antes. El componente no sabe calcular porcentajes, se lo pide a la "lógica".
+Uso de la lógica: en el caso de MECENAZGO, estamos llamando a las funciones de hammerLogic.ts que creamos antes. El componente no sabe calcular porcentajes, se lo pide a la "lógica".
 
 Tailwind Dinámico: Usamos style={{ width: ... }} para que la barra de progreso se mueva de verdad según los datos.      
+
+- 2. Integración de Lógica: Usando las funciones que creamos en el paso anterior (calcularProgreso), uniendo la Arquitectura con la Vista
+
+- 3. Con "Renderizado Condicional" ({condicion && ...}): Hacemos que React puede ocultar o mostrar partes de la interfaz basándose en los datos.
 
 ---
 
 - 2. Transformación de App.tsx
 
-Vamos a actualizar tu App.tsx para que haga tres cosas:
+Actualizamos App.tsx para que haga tres cosas:
 
     Importar tus datos de prueba (PRODUCTOS_MOCK).
 
@@ -139,7 +142,35 @@ Vamos a actualizar tu App.tsx para que haga tres cosas:
 
     Dibujar una cuadrícula (grid) con todos tus productos.
 
-- 3. COMO se ve REACT
+- 3. Ejemplo de crear componentes como listas, tarjetas, formularios o modales que **consuman datos tipados** (de la API o del estado global):
 
-Para completar este bloque, creamo un Componente de React (por ejemplo, CardItem.tsx) que use esa lógica para mostrar una tarjeta u otra dependiendo de si es "VENTA" o "MECENAZGO".
+en archivo mochData.ts
 
+se paso de:
+    {
+    id: '3',
+        tipo: 'TUTORIAL',
+        titulo: 'Tutorial de Pintura Avanzada',
+        autor: 'Archaon_Paints',
+        imagen: 'https://images.unsplash.com/photo-1558444479-2706fa58b8ec?q=80&w=300',
+        categoria: 'Tutorial Pintado',
+        duracion: '2 horas',
+        precio: 20
+    }
+
+a
+    {
+        id: '3',
+        tipo: 'TUTORIAL',
+        titulo: 'Tutorial de Pintura Avanzada',
+        autor: 'Archaon_Paints',
+        imagen: 'https://images.unsplash.com/photo-1558444479-2706fa58b8ec?q=80&w=300',
+        categoria: 'Tutorial Pintado',
+        duracion: '2 horas',
+        nivel: 'Intermedio',   // NOTA. FALTABA esta propiedad "nivel"
+        precio: 20
+    }
+
+
+# Paso 7: Interactividad y Filtros
+Modificando "App.tsx" ir doc/hooks.md

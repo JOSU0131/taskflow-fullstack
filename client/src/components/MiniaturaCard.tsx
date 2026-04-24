@@ -7,13 +7,13 @@ interface Props {
 
 export const MiniaturaCard = ({ item }: Props) => {
   return (
-    <div className="group bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 hover:border-orange-500/50 transition-all duration-300 shadow-lg hover:shadow-orange-500/10">
+    <div className="relative h-48 w-full overflow-hidden bg-slate-700">
       {/* Imagen con Badge de Tipo */}
       <div className="relative h-48 w-full overflow-hidden">
         <img 
           src={item.imagen} 
           alt={item.titulo} 
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" 
+          className="w-full h-full object-cover" 
         />
         <div className="absolute top-3 left-3 bg-slate-900/80 backdrop-blur-md px-2 py-1 rounded-md border border-white/10">
           <span className="text-[10px] font-bold uppercase tracking-widest text-white">
