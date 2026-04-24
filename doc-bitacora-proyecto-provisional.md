@@ -217,8 +217,6 @@ Siguientes Pasos
 ## Fallo en vercel
 El error Command "npm run build" exited with 2 que viste anteriormente se debe exactamente a estos dos fallos de TypeScript. El compilador es estricto y, al detectar errores, detiene la generación de la carpeta dist, lo que impide que Vercel pueda desplegar nada.
 
-Aquí tienes la solución para corregir ambos archivos y que el build pase sin problemas:
-
 1. Corregir src/components/GridProductos.tsx
 
     El error TS1484 ocurre porque tu configuración de TypeScript (verbatimModuleSyntax) exige que los tipos se importen explícitamente como tales.
@@ -235,3 +233,24 @@ Aquí tienes la solución para corregir ambos archivos y que el build pase sin p
 
     MOTIVO: ¿Por qué se bloquea el despliegue?
     En entornos profesionales, se activa una regla llamada noUnusedLocals. Esta regla considera que tener código que no se usa es "basura" que ocupa memoria y confunde a otros programadores. Por eso, aunque el código funcione, TypeScript se niega a hacer el build hasta que lo limpies.
+
+3. Conflicto de Identidad (Vínculos Fantasmas)
+El proyecto intentaba conectarse a una instancia antigua de Vercel (taskflow4). 
+
+    - Cual era el problema o Síntoma?: Al intentar desplegar o abrir la web, aparecía un error 404 NOT FOUND o la pestaña del navegador mostraba el nombre de un proyecto antiguo (taskflow4-react) en lugar del actual.
+
+    - La Causa Raíz: Existía una carpeta oculta llamada .vercel tanto en la raíz como en /client. Estos archivos contenían IDs antiguos que "obligaban" a tu ordenador a conectarse al proyecto equivocado de la nube.
+
+    - Adicionalmente había un Conflicto de Nombres: El archivo package.json seguía identificado como taskflow4-react, lo que confundía a Vercel al intentar vincularlo con el nuevo repositorio de GitHub.
+
+Pasos para la Solución ("Operación Limpieza")
+    1. Poda de Archivos Ocultos: Borramos todas las carpetas .vercel existentes para romper cualquier vínculo previo con el servidor.
+
+    2. Actualización de Identidad: Editamos el package.json para darle un nombre nuevo y único al proyecto (hammerflow-forge).
+
+    3. Configuración del Directorio Raíz (Root): En el panel de Vercel, especificamos que el código real vive en la subcarpeta /client. Esto permitió que Vercel supiera exactamente dónde buscar el archivo de entrada.
+            Se cambio el Root Directory en la web de vercel (https://vercel.com/josus-projects-e490e732/taskflow-fullstack/settings/build-and-deployment) en Settings / build and deployment
+
+    4. Vinculación Limpia: Ejecutamos el comando vercel desde la raíz, negándonos a usar proyectos existentes y creando uno nuevo desde cero.
+
+    5. Integración con GitHub: Aceptamos la conexión directa con el repositorio. Esto activó el CI/CD (Despliegue Continuo), lo que significa que a partir de ahora, GitHub y Vercel "hablan" el mismo idioma automáticamente.
