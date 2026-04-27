@@ -211,3 +211,25 @@ Typescript
     TypeScript
         {/* RUTA 3: ERROR 404 (Captura cualquier ruta no definida) */}
                 <Route path="*" element={<NotFound />} />
+
+
+# Validación y Control de Calidad
+Hacemos tres pruebas críticas para asegurar la integridad de la aplicación:
+
+1. Test de Integridad de Módulos (Pantalla Blanca):
+    Objetivo: Verificar que la conexión entre App.tsx y las nuevas rutas en /pages es correcta.
+
+    Resultado: Éxito. La aplicación renderiza el contenido sin errores de importación/exportación. (En caso de error, la consola de desarrollador es el primer punto de diagnóstico).
+
+2. Test de Persistencia de Lógica (Filtros Dinámicos):
+    Objetivo: Confirmar que el Custom Hook useProductos funciona correctamente al haber sido trasladado a Home.tsx.
+
+    Resultado: Éxito. El filtrado por categorías responde instantáneamente, validando que el estado de React se mantiene saludable en la nueva jerarquía.
+
+3. Test de Navegación Manual (Rutas y 404):
+    Objetivo: Comprobar que el "cerebro" de React Router intercepta las URLs correctamente.
+
+    Pruebas realizadas:
+    - Acceso a /producto/1: Se visualiza el componente de detalle provisional.
+    - Acceso a /ruta-inexistente: Salta automáticamente la página 404 "Unidad Eliminada".
+    - Botón de retorno: El componente <Link> devuelve al usuario a la Home sin recargar la página, confirmando que es una SPA (Single Page Application) real.
