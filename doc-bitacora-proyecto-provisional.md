@@ -254,3 +254,6 @@ Pasos para la Solución ("Operación Limpieza")
     4. Vinculación Limpia: Ejecutamos el comando vercel desde la raíz, negándonos a usar proyectos existentes y creando uno nuevo desde cero.
 
     5. Integración con GitHub: Aceptamos la conexión directa con el repositorio. Esto activó el CI/CD (Despliegue Continuo), lo que significa que a partir de ahora, GitHub y Vercel "hablan" el mismo idioma automáticamente.
+
+# Paso 9. Rutas y navegación
+Ir a docs/routing.md
