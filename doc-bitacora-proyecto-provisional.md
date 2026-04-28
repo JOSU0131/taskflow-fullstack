@@ -257,3 +257,11 @@ Pasos para la Solución ("Operación Limpieza")
 
 # Paso 9. Rutas y navegación
 Ir a docs/routing.md
+
+# Paso 10. Formularios e Interacción.
+Aquí es donde la web deja de ser una "galería para mirar" y se convierte en una "herramienta para trabajar". 
+
+En nuestro lab/proyecto **HammerFlow Forge**, esto consistirá en:
+    1. Un formulario para subir nuevas miniaturas (Nombre, precio, categoría, URL de imagen).
+    2. Un formulario de contacto o reserva para los artistas.
+    3. Validación y Control

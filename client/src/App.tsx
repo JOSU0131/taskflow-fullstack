@@ -3,6 +3,8 @@ import { useProductos } from './hooks/useProductos';
 import { GridProductos } from './components/GridProductos';
 import type { Categoria } from './types/miniatures';
 import NotFound from './pages/NotFound';
+import NuevoProducto from './pages/NuevoProducto';
+
 
 function App() {
   // Extraemos todo lo necesario de nuestro Custom Hook
@@ -74,6 +76,7 @@ function App() {
               Cargando datos del guerrero...
             </div>
         } />
+        <Route path="/nuevo" element={<NuevoProducto />} />
 
         {/* RUTA 404 - NOT FOUND (Captura cualquier ruta no definida) */}
         <Route path="*" element={<NotFound />} />
