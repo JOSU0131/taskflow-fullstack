@@ -213,3 +213,81 @@ Cada vez que pulsas una tecla para escribir "Dragón", ocurre este ciclo infinit
 
 ¿Por qué esto es mejor que el método antiguo?
 En el desarrollo web antiguo, el programador tenía que ir al HTML y "preguntar": ¿Oye, qué hay escrito en esta caja?. Con React, tú no preguntas, tú ya lo sabes, porque la información vive en tu código, no solo en la pantalla.
+
+
+## 4. Muestrar mensajes de error y confirmación
+Ahora mismo el NuevoProducto.tsx guarda los datos, pero si el usuario comete un error, no se entera de nada. Vamos a darle "voz" al formulario.
+
+1. Añade los estados de interacción
+Debajo de los estados actuales, añadimos estos dos:
+    Typescript
+    const [descripcion, setDescripcion] = useState('');  //(ya está)
+
+    // NUEVOS ESTADOS
+    const [error, setError] = useState(''); 
+    const [enviado, setEnviado] = useState(false);
+
+2. Implementamos la Validación (Lógica del Paso 10)
+Vamos a modificar la función "handleSubmit". 
+El objetivo es que, si algo está mal, frenemos el envío y avisemos al usuario.
+
+Sustituimos handleSubmit por:
+    Typescript:
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        // Resetear estados
+        setError('');
+        setEnviado(false);
+
+        // VALIDACIÓN BÁSICA
+        if (nombre.trim().length < 3) {
+        setError('El nombre debe tener al menos 3 caracteres.');
+        return; // Cortamos aquí, no sigue ejecutando
+        }
+
+        if (Number(precio) <= 0) {
+        setError('¿Un Dragón gratis? El precio debe ser mayor a 0.');
+        return;
+        }
+
+        // SI TODO ESTÁ BIEN:
+        console.log("Datos validados:", { nombre, precio, categoria, descripcion });
+        setEnviado(true);
+        
+        // Limpiar formulario tras el éxito
+        setNombre('');
+        setPrecio('');
+        setCategoria('');
+        setDescripcion('');
+    };
+
+3. Muestramos los mensajes en la Interfaz
+Para que el usuario vea qué está pasando, añadimos:
+    Typescript:
+    {/* MENSAJE DE ERROR */}
+        {error && (
+            < div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded-lg text-sm font-bold animate-pulse">
+                ⚠️ {error}
+            </div>
+        )}
+
+    {/* MENSAJE DE ÉXITO */}
+        {enviado && (
+            <div className="bg-green-500/10 border border-green-500 text-green-500 p-3 rounded-lg text-sm font-bold">
+            ✅ ¡Unidad forjada y añadida al inventario!
+        </div>
+    )}
+
+### Resumen: ¿Por qué hacemos esto? 
+En React, la interacción no es solo guardar datos, es comunicarse con el usuario:
+
+    Estado de Error: Evita que entren datos basura en tu base de datos (como precios negativos). * Estado de Éxito: Da tranquilidad al usuario confirmando que su acción funcionó.
+
+    Limpieza de Estado: Al hacer setNombre('') tras el éxito, dejas el formulario listo para la siguiente pieza sin que el usuario tenga que borrar a mano
+
+- Pequeña validación de funcionamiento
+    Prubamos esto, en la web:
+    1. Intentamos enviar el formulario con el precio en 0.
+    2. ¿Te sale el mensaje rojo?
+    3. Si salta el mensaje, TODO OK.  Pasamos al paso 11

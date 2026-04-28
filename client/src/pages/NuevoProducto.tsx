@@ -9,11 +9,37 @@ export default function NuevoProducto() {
   const [categoria, setCategoria] = useState<Categoria | ''>('');
   const [descripcion, setDescripcion] = useState('');
 
+// NUEVOS ESTADOS para manejo de errores y confirmación de envío (PASO 10)
+  const [error, setError] = useState(''); 
+  const [enviado, setEnviado] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Aquí es donde validamos los datos antes de enviarlos
-    console.log({ nombre, precio, categoria, descripcion });
-    alert(`¡El ${nombre} ha sido catalogado por ${precio} piezas de oro!`);
+    
+    // Resetear estados
+    setError('');
+    setEnviado(false);
+
+    // VALIDACIÓN BÁSICA (Paso 10)
+    if (nombre.trim().length < 3) {
+      setError('El nombre debe tener al menos 3 caracteres.');
+      return; // Cortamos aquí, no sigue ejecutando
+    }
+
+    if (Number(precio) <= 0) {
+      setError('¿Un Dragón gratis? El precio debe ser mayor a 0.');
+      return;
+    }
+
+    // SI TODO ESTÁ BIEN:
+    console.log("Datos validados:", { nombre, precio, categoria, descripcion });
+    setEnviado(true);
+    
+    // Limpiar formulario tras el éxito
+    setNombre('');
+    setPrecio('');
+    setCategoria('');
+    setDescripcion('');
   };
 
 
@@ -85,6 +111,20 @@ export default function NuevoProducto() {
             />
             </div>
     
+            {/* MENSAJE DE ERROR */}  
+            {error && (
+              <div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded-lg text-sm font-bold animate-pulse">
+                ⚠️ {error}
+              </div>
+            )}
+
+            {/* MENSAJE DE ÉXITO */}
+            {enviado && (
+              <div className="bg-green-500/10 border border-green-500 text-green-500 p-3 rounded-lg text-sm font-bold">
+                ✅ ¡Unidad forjada y añadida al inventario!
+              </div>
+            )}
+
 
 
             <button 
