@@ -16,8 +16,6 @@ export default function NuevoProducto() {
     alert(`¡El ${nombre} ha sido catalogado por ${precio} piezas de oro!`);
   };
 
-// ESTO ES EL ESPÍA:
-  console.log("El estado actual del nombre es:", nombre);
 
   return (
     <div className="max-w-2xl mx-auto bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-2xl">

@@ -179,4 +179,37 @@ Y asegura que el usuario sepa dónde está ("Registrar Nueva Pieza") y tenga una
 ## 3. Validamos con una prueba para entender el "Componente Controlado"
 Para que ver "la magia" del *onChange* y el estado, vamos a añadir un "espía" temporal en tu código.
 
-    1. En tu archivo NuevoProducto.tsx, añadimos un console.log
+    1. En tu archivo NuevoProducto.tsx, añadimos un console.log, justo antes del return
+    Typescript
+    // ESTO ES EL ESPÍA:
+    console.log("El estado actual del nombre es:", nombre);
+
+    2. Subimos el cambio a github, y vemos la web en vercel. 
+    En la direción de navegación escribimos /nuevo:
+            // *https://taskflow-fullstack-psi.vercel.app/nuevo*
+
+    3. Pulsamos F12 (o Clic derecho > Inspeccionar) y vamos a la pestaña Console.
+
+    4. En la pagina web, en el campo de nombre, empezamos a escrir la palabra "Dragón"
+
+    ¿Qué verás?
+        Escribes D -> La consola dice: El estado actual del nombre es: D
+        Escribes r -> La consola dice: El estado actual del nombre es: Dr
+        Escribes a -> La consola dice: El estado actual del nombre es: Dra
+
+    Al escribir la palabra Dragón salio una "cascada" de mensajes.
+
+    Esa cascada de mensajes en la consola es la prueba irrefutable de que has dominado el Componente Controlado.
+
+### Resumen de la prueba
+¿Qué está pasando exactamente detrás de las cámaras?
+Cada vez que pulsas una tecla para escribir "Dragón", ocurre este ciclo infinito a la velocidad del rayo:
+
+        1. Evento: Pulsas la 'D'. El navegador lanza un evento onChange.
+        2. Captura: Tu código captura esa 'D' con e.target.value.
+        3. Actualización: Llamas a setNombre('D').
+        4. Sincronización: React recibe el nuevo valor, guarda 'D' en su memoria (el Estado) y vuelve a dibujar el componente.
+        5. Reflejo: El input ahora muestra 'D' porque su value está amarrado al estado.
+
+¿Por qué esto es mejor que el método antiguo?
+En el desarrollo web antiguo, el programador tenía que ir al HTML y "preguntar": ¿Oye, qué hay escrito en esta caja?. Con React, tú no preguntas, tú ya lo sabes, porque la información vive en tu código, no solo en la pantalla.
