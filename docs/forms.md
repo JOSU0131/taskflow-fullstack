@@ -20,7 +20,7 @@ NOTA: typescript nos advertirá en App.tsx  "/pages/NuevoProducto has no default
 
 3. Creamos la estructura básica en "NuevoProducto.tsx"
         
-        **NOTA**: NO olvidar añadir codigo de export
+        **NOTA**: NO olvidar añadir codigo de export e import
         En JavaScript/React, cuando haces un import NuevoProducto from '...', el archivo de destino está obligado a tener una línea que diga "export default". Si el archivo está en blanco, el import se queda "colgado".
 
 - Typescript. // Primera versión del formulario en pagina-documento "NuevoProducto.tsx"
@@ -78,7 +78,7 @@ NOTA: typescript nos advertirá en App.tsx  "/pages/NuevoProducto has no default
 ## 1. Formulario completo
 Para que este formulario sea "útil" necesitamos que sea un poco más complejo. Los prodcuto es una tienda no solo tienen nombre, también suelen necesitar precio, categoría y quizás una descripción.
 
-1. Ampliamos el formulario
+1. Ampliamos el formulario en pagina-documento "NuevoProducto.tsx"
 Definimos los Estados (useState). Concepto "cubos", donde el usuario guardara la información que escribe.
 
     Creamos cuatro estados: nombre, precio, categoria y descripcion.
@@ -97,6 +97,10 @@ Definimos los Estados (useState). Concepto "cubos", donde el usuario guardara la
 
         **NOTA** ¿Por qué? 
         En React, si no guardas lo que se escribe en un "estado", la información se pierde cada vez que el componente se actualiza. El estado es la memoria a corto plazo de tu componente.
+
+**NOTA IMPORTANTE** No olvidar añadir
+        // Importamos el tipo que ya creamos
+        import type { Categoria } from '../types/miniatures';
 
 2. Crear los Inputs. Concepto de "componente controlado"
 Un componente controlado es un input que React domina al 100%.
@@ -173,3 +177,6 @@ Y asegura que el usuario sepa dónde está ("Registrar Nueva Pieza") y tenga una
 
 
 ## 3. Validamos con una prueba para entender el "Componente Controlado"
+Para que ver "la magia" del *onChange* y el estado, vamos a añadir un "espía" temporal en tu código.
+
+    1. En tu archivo NuevoProducto.tsx, añadimos un console.log
