@@ -1,5 +1,5 @@
 // src/api/miniatureService.ts
-import { Miniature, Categoria } from '../types/miniatures';
+import type { Miniature, Categoria } from '../types/miniatures';
 
 const API_URL = 'http://localhost:4000/api/miniatures';
 

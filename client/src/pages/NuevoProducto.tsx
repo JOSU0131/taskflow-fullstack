@@ -1,3 +1,4 @@
+import { miniatureService } from '../api/miniatureService';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Categoria } from '../types/miniatures';
@@ -13,33 +14,47 @@ export default function NuevoProducto() {
   const [error, setError] = useState(''); 
   const [enviado, setEnviado] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Resetear estados
+    // 1. Limpiamos estados de intentos previos
     setError('');
     setEnviado(false);
 
-    // VALIDACIÓN BÁSICA (Paso 10)
+    // 2. Validación básica (Paso 10/11)
     if (nombre.trim().length < 3) {
       setError('El nombre debe tener al menos 3 caracteres.');
-      return; // Cortamos aquí, no sigue ejecutando
-    }
-
-    if (Number(precio) <= 0) {
-      setError('¿Un Dragón gratis? El precio debe ser mayor a 0.');
       return;
     }
 
-    // SI TODO ESTÁ BIEN:
-    console.log("Datos validados:", { nombre, precio, categoria, descripcion });
-    setEnviado(true);
-    
-    // Limpiar formulario tras el éxito
-    setNombre('');
-    setPrecio('');
-    setCategoria('');
-    setDescripcion('');
+    if (Number(precio) <= 0) {
+      setError('El precio debe ser mayor a 0.');
+      return;
+    }
+
+    try {
+      // 3. CAPA DE RED: Enviamos al backend y esperamos (Paso 12)
+      await miniatureService.createMiniature({
+        nombre,
+        precio: Number(precio),
+        categoria: categoria as any, // 'any' temporal para evitar conflictos de tipos
+        descripcion
+      });
+
+      // 4. ÉXITO: Si el servidor responde 201
+      setEnviado(true);
+      
+      // Limpiamos los campos para una nueva entrada
+      setNombre('');
+      setPrecio('');
+      setCategoria('');
+      setDescripcion('');
+
+    } catch (err) {
+      // 5. GESTIÓN DE ERROR DE RED
+      setError('Hubo un problema con la forja (Error de conexión con el servidor).');
+      console.error("Error al crear:", err);
+    }
   };
 
 

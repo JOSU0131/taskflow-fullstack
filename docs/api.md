@@ -151,10 +151,24 @@ Actualmente, cuando rellenamos el formulario en la web, los datos se quedan "flo
     
     Esto servirá para centralizar todas las peticiones.
 
-    TypeScript
-    vamos a 
-    // src/api/miniatureService.ts
+            TypeScript
+            
 
+- 2. Conectar el Formulario (actualizar NuevoProducto.tsx)
+Ahora vamos a modificar la función "handleSubmit" de el formulario para que use este servicio en lugar de solo mostrar un alert.  
+
+    Actualizamos handleSubmit así:
+            TypeScript
+
+¿Qué cambiamos con este paso realmente?
+    - async / await: Ahora la función es asíncrona porque la red no es instantánea.  
+
+    - try...catch: Este bloque es obligatorio (en la siguiente fase12). El try intenta enviar la miniatura, y si el servidor está apagado o hay un error, el catch lo captura para que la aplicación no "explote" y mostre el mensaje de error al usuario.
+
+    - Persistencia Real: Ya no usamos alert. Si el código llega a setEnviado(true), significa que tu producto/Dragón ya vive en la memoria del servidor Node.js[cite: 4].
+
+ --- 
+ ---
 
 ## 3. Seguridad y Validación "en la frontera"
 
@@ -165,3 +179,65 @@ nnn / nnn / nnn / nnn
 GET 	/api/miniatures	        Obtiene todo el catálogo	        200 OK
 POST	/api/miniatures	        Crea una nueva pieza (Dragón Rojo)	201 Created
 DELETE	/api/miniatures/:id	    Elimina una pieza	                200 OK
+
+- 0. Paso previo. **DOS TERMINALES**
+
+Para realizar esa acción, necesitaMOS tener dos terminales abiertas simultáneamente, ya que ahora tENEMOS dos aplicaciones independientes (Frontend y Backend) que deben hablar entre sí.
+
+    Termina "1" En backend
+        Bash
+        En backend, es decir la carpeta server en raiz del proyecto:
+        cd server
+        Arrancamos el servidor:
+        node index.js
+            Deberíamos ver el mensaje:  Servidor de la Forja rugiendo en http://localhost:4000
+
+    Terminal "2" La Interfaz, Frontend
+        Bash
+        En carpeta client
+        cd client
+        Arrancamos Vite
+        npm run dev
+            Abrimos el enlace
+
+- 1. Prueba POST. Prueba del 201 (Creación Exitosa)
+**NOTA**
+Nos dio error, pasamos  a usar Thunderclient
+
+Crear Miniatura (POST) en Thunder Client
+Se validó la creación de una nueva pieza en el catálogo obteniendo un código 201 Created.
+
+    Observaciones:
+        Status: 201 Created ✅
+        Payload: Se envió nombre, precio, categoría y descripción.
+        Respuesta: El servidor retornó el objeto con un ID único generado automáticamente.
+
+        ### Evidencia de funcionamiento (POST)
+        Se ha verificado la creación de miniaturas mediante Thunder Client, obteniendo un código 201.
+    **IMAGEN**:
+        ![Prueba POST exitosa](./screenshots/test-post-success.png)
+
+
+2- Probando la Robustez (Validaciones también en Thunder CLient)
+Para cumplir con los códigos 400 y 404 que nos pide el Paso 11, hacemos las siguientes pruebas:
+
+    - Para el 400 (Bad Request): 
+    Borramos la línea del "nombre" en el JSON y damos Send. 
+    El servidor debería responder con el mesanje de error.
+
+    El servidor devuelve:
+            "message": "Nombre y precio son obligatorios"
+
+    - Para el 404 (Not Found): 
+    Cambia el método a DELETE y pon una URL que no exista, como http://localhost:4000/api/miniatures/999. 
+    
+    El servidor devuelve:
+            "message": "No se puede borrar lo que no existe"
+
+3. El Paso Final: GET (Lectura)
+Cambiamos el método a GET, borramos todo lo que haya en el Body y hacemos Send a la URL principal.
+
+    Resultado esperado: Veremos un array [] con todas las miniaturas que hayamos creado durante las pruebas. Esto confirma que la Capa de Red es bidireccional: "podemos enviar y recibir."
+
+    Confirmado, salio el producto Dragon de escacha y otros productos x
+    ![Prueba GET exitosa](./screenshots/test-get-success.png)
