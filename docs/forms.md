@@ -286,8 +286,27 @@ En React, la interacción no es solo guardar datos, es comunicarse con el usuari
 
     Limpieza de Estado: Al hacer setNombre('') tras el éxito, dejas el formulario listo para la siguiente pieza sin que el usuario tenga que borrar a mano
 
-- Pequeña validación de funcionamiento
+
+- Características Técnicas
+    
+    Estado Centralizado: Se utiliza el hook useState para sincronizar los inputs de texto, numéricos y selectores con el estado de React.
+
+    Validación Preventiva: El sistema impide el envío de datos si no cumplen los requisitos mínimos:
+            Nombre: Mínimo 3 caracteres.
+
+            Precio: Debe ser estrictamente superior a 0.
+
+    Interfaz de Respuesta: Implementación de mensajes condicionales para errores de validación y confirmación de éxito tras el envío.
+
+- Ejemplo de Flujo de Validación
+    
+    Pequeña validación de funcionamiento
     Prubamos esto, en la web:
     1. Intentamos enviar el formulario con el precio en 0.
-    2. ¿Te sale el mensaje rojo?
-    3. Si salta el mensaje, TODO OK.  Pasamos al paso 11
+    2. ¿Te sale el mensaje rojo? ("⚠️ ¿Un Dragón gratis? El precio debe ser mayor a 0")
+    3. Sí, salta el mensaje, TODO OK.  Pasamos al paso 11
+
+- FEAT técnico:
+    El usuario intenta registrar un producto con precio 0.
+    La función handleSubmit intercepta el evento y cancela la recarga de página (e.preventDefault()).
+    Se activa el estado de error, mostrando dinámicamente el aviso en pantalla.
