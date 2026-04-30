@@ -6,13 +6,15 @@ import NotFound from './pages/NotFound';
 import NuevoProducto from './pages/NuevoProducto';
 
 
+
 function App() {
   // Extraemos todo lo necesario de nuestro Custom Hook
   const { 
     productosFiltrados, 
     categoriaSeleccionada, 
     setCategoriaSeleccionada, 
-    estaCargando 
+    estaCargando,
+    error 
   } = useProductos();
 
   // Lista de categorías únicas para los botones
@@ -57,17 +59,39 @@ function App() {
             ))}
           </div>
       
-          {estaCargando ? (
-          /* PANTALLA DE CARGA */
+          {/* --- GESTIÓN DE LOS 3 ESTADOS DE RED (PASO 12) --- */}
+
+          {/* 1. ESTADO DE ERROR */}
+          {error && (
+            <div className="mt-10 bg-red-500/10 border border-red-500 text-red-500 p-6 rounded-xl text-center">
+              <p className="font-black">❌ ERROR EN LA FORJA</p>
+              <p className="text-sm opacity-80">{error}</p>
+              <button 
+                onClick={() => window.location.reload()} 
+                className="mt-4 text-xs underline font-bold"
+              >
+                Reintentar conexión
+              </button>
+            </div>
+          )}
+
+          {/* 2. ESTADO DE CARGA */}
+          {estaCargando && !error && (
             <div className="flex flex-col items-center justify-center h-64">
               <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="mt-4 text-slate-500 font-bold animate-pulse">FORJANDO MINIATURAS...</p>
-            </div>
-          ) : (
+                <p className="mt-4 text-slate-500 font-bold animate-pulse uppercase tracking-widest">
+                  Conectando con el servidor...
+                </p>
+              </div>
+          )}
+
+          {/* 3. ESTADO DE ÉXITO (DATOS) */}
+          {!estaCargando && !error && (
             <GridProductos items={productosFiltrados} />
           )}
           </>
         } />
+
 
         {/* Otras rutas podrían ir aquí */}
         {/* NUEVA RUTA: Detalle del producto (por ahora vacía) */}

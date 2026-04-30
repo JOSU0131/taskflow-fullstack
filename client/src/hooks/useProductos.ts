@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
-import { PRODUCTOS_MOCK } from '../data/mockData';
-import type { Categoria } from '../types/miniatures';
+import { miniatureService } from '../api/miniatureService'; // Importamos el servicio real BORRAMOS EL MOCK
+import type { Categoria, HammerItem } from '../types/miniatures';
 
 // 1. INICIALIZACIÓN CON LOCALSTORAGE
   // En lugar de empezar en 'null', revisamos si hay algo guardado en el navegador
 export const useProductos = () => {
+
+const [productos, setProductos] = useState<HammerItem[]>([]); // Ahora empezamos con un array vacío
 const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<Categoria | null>(() => {
     const guardado = localStorage.getItem('hammer-categoria');
     // Si existe, lo devolvemos como el estado inicial; si no, usamos null
@@ -12,6 +14,7 @@ const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<Categoria | n
   });
 
 const [estaCargando, setEstaCargando] = useState(true);
+const [error, setError] = useState<string | null>(null); // AÑADIMOS Paso 12
 
   // 2. PERSISTENCIA AUTOMÁTICA (Nuevo useEffect)
   useEffect(() => {
@@ -23,28 +26,42 @@ const [estaCargando, setEstaCargando] = useState(true);
     }  
   }, [categoriaSeleccionada]);
 
-
-
-  // SIMULACIÓN DE CARGA (useEffect)
-  // Usamos useEffect para simular que los datos vienen de una base de datos
+  // SIMULACIÓN DE CARGA (useEffect)  BORRADO EN PASO 12, YA NO SIMULAMOS CARGA, SINO QUE REALMENTE TRAEMOS LOS DATOS DESDE EL BACKEND
+  // 3. CARGA REAL DE DATOS (Sustituye a tu simulación de 1.2s)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setEstaCargando(false);
-    }, 1200); // 1.2 segundos de "Loading"
+    const obtenerDatos = async () => {
+      try {
+        setEstaCargando(true);
+        setError(null);
+        // Llamamos a la API real
+        const data = await miniatureService.getAllMiniatures();
+        setProductos(data);
+      } catch (err) {
+        // Si el servidor está apagado, saltará aquí
+        setError('No se pudo conectar con la forja (Servidor offline)');
+      } finally {
+        setEstaCargando(false);
+      }
+    };
 
-    return () => clearTimeout(timer); // Limpieza del efecto
-  }, []);
+    obtenerDatos();
+  } , []); // Solo se ejecuta una vez al montar el componente 
 
-  // FILTRADO OPTIMIZADO (useMemo)
+
+
+  // FILTRADO OPTIMIZADO (useMemo)  ACTUAZLIZADO PARA USAR LOS DATOS REALES EN LUGAR DE MOCK
+  // 4. FILTRADO (Ahora usa 'productos' de la API en vez de MOCK)
+
   const productosFiltrados = useMemo(() => {
-    if (!categoriaSeleccionada) return PRODUCTOS_MOCK;
-    return PRODUCTOS_MOCK.filter(item => item.categoria === categoriaSeleccionada);
-  }, [categoriaSeleccionada]);
+    if (!categoriaSeleccionada) return productos;
+    return productos.filter(item => item.categoria === categoriaSeleccionada);
+  }, [categoriaSeleccionada, productos]); // Añadimos 'productos' a las dependencias
 
   return {
     productosFiltrados,
     categoriaSeleccionada,
     setCategoriaSeleccionada,
-    estaCargando
+    estaCargando,
+    error   // Lo devolvemos para que App.tsx no de error
   };
 };
