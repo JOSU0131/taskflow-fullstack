@@ -335,3 +335,11 @@ La web se veía blanca en Vercel porque:
     Vercel, al no poder completar el comando npm run build, no actualizaba los archivos en el servidor.
 
 Estado Final: Una vez unificado el lenguaje (todo a titulo) y limpiado los archivos de configuración de Tailwind v3, el compilador da "luz verde" y los estilos de la v4 se inyectan correctamente.
+
+
+# Nuevo error. Problemas de Post-Despliegue
+**NOTA**: ir a /docs/deployment
+
+    Fallo de Conexión (CORS/URL): La aplicación frontend en producción intenta consumir una API en localhost:4000. Se identifica que es necesario configurar una variable de entorno (VITE_API_URL) para que en producción apunte al servidor desplegado y no al local.
+
+    Sincronización de Repositorio: Se confirma que GitHub y Vercel están sincronizados (35 commits en total). Los cambios en la carpeta client se despliegan de forma independiente a la carpeta server.

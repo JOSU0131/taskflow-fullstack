@@ -1,7 +1,7 @@
 // src/api/miniatureService.ts
 import type { HammerItem } from '../types/miniatures';
 
-const API_URL = 'http://localhost:4000/api/miniatures';
+const API_URL = '/api';
 
 export const miniatureService = {
   // GET: Traer todas las minis
