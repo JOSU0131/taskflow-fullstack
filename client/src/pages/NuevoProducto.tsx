@@ -34,12 +34,18 @@ export default function NuevoProducto() {
 
     try {
       // 3. CAPA DE RED: Enviamos al backend y esperamos (Paso 12)
-      await miniatureService.createMiniature({
-        nombre,
+      await miniatureService.create({
+        titulo: nombre,      // En tu interfaz es 'titulo', no 'nombre'
         precio: Number(precio),
-        categoria: categoria as any, // 'any' temporal para evitar conflictos de tipos
-        descripcion
-      });
+        categoria: categoria as Categoria,
+        descripcion: descripcion,
+        // Añadimos campos obligatorios de BaseItem para que TS no se queje
+        autor: "Artista Invitado", 
+        imagen: "https://via.placeholder.com/400",
+        tipo: 'VENTA',       // Definimos un tipo por defecto
+        stock: 1             // ItemVenta requiere stock
+      } as any);
+    
 
       // 4. ÉXITO: Si el servidor responde 201
       setEnviado(true);

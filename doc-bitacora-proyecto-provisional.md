@@ -298,15 +298,40 @@ Limpiamos:
         Dentro de la carpeta client:
         Borramos:  tailwind.config.js, postcss.config.js
 
-3. Re-Configuramos index.css
-    Borramos:
-        @tailwind base;
-        @tailwind components;
-        @tailwind utilities;
-    Por
-    CSS
-        @import "tailwindcss";
+    - Re-Configuramos index.css
+            Borramos:
+            @tailwind base;
+            @tailwind components;
+            @tailwind utilities;
+        Por
+            CSS
+            @import "tailwindcss";
 
 **NOTA IMPORTANTE**: ¿Por qué se veía "blanco" la web? 
 Al tener instalada la versión 4 de Tailwind pero usando las directivas de la versión 3 (o viceversa), el compilador fallaba silenciosamente y generaba un archivo CSS vacío. 
 Vercel lo intenta desplegar, pero sin estilos.
+
+3. Resolución de Errores de Compilación
+¿Dónde estaba el fallo "gordo"?
+El despliegue en Vercel fallaba no solo por los estilos, sino por un bloqueo del compilador de TypeScript (tsc). 
+En un entorno profesional, si TypeScript detecta que intentas enviar datos que no coinciden con tus interfaces, detiene la construcción por seguridad.
+
+Hubo 3 Desajustes:
+    1. Nombre del Método: Se estaba llamando a miniatureService.createMiniature() cuando el método real en el servicio es simplemente create().  
+    2. Propiedad "Título" vs "Nombre": Según el archivo miniatures_2.ts, la interfaz BaseItem utiliza la propiedad titulo. Intentar usar nombre o name disparaba el error TS2353.  
+    3. Campos Obligatorios: La interfaz BaseItem exige campos que no se estaban enviando desde el formulario, como autor, imagen y tipo. 
+
+Solucion:
+    1. Se implementó un "mapeo" de datos en NuevoProducto_4.tsx para traducir el estado del formulario al lenguaje que entiende el Backend y TypeScript:  De nombre (UI) → a titulo (Data).  Asignación de tipos: 2. Se forzó el campo tipo como 'VENTA' para satisfacer la Unión Discriminada de HammerItem.  
+    3. Casteo de tipos: Se usó as any o as Categoria para evitar que TypeScript bloquee el envío mientras se termina de definir la lógica de los nuevos productos (Tutoriales/Bustos).
+
+## RESUMEN TÉCNICO
+La web se veía blanca en Vercel porque:
+
+    Tailwind v4 ignoraba las directivas de la v3, generando un CSS de 0 bytes.
+
+    TypeScript abortaba el proceso de build al encontrar errores de nombre en las propiedades de los objetos (titulo vs nombre).
+
+    Vercel, al no poder completar el comando npm run build, no actualizaba los archivos en el servidor.
+
+Estado Final: Una vez unificado el lenguaje (todo a titulo) y limpiado los archivos de configuración de Tailwind v3, el compilador da "luz verde" y los estilos de la v4 se inyectan correctamente.
