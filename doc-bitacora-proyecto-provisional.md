@@ -265,3 +265,30 @@ En nuestro lab/proyecto **HammerFlow Forge**, esto consistirá en:
     1. Un formulario para subir nuevas miniaturas (Nombre, precio, categoría, URL de imagen).
     2. Un formulario de contacto o reserva para los artistas.
     3. Validación y Control
+
+# Paso Extra. Estética 
+Dado que el proyecto había heredado una estética "plana" al clonar/hacer pull del proyecto anterior en github. Ese proyecto habia sido inicializado usando el comando de **Vite** para crear un entorno de React con TypeScript.
+
+
+Como estamos usando Tailwind CSS, podemos hacer cambios sin tocar un solo archivo .css, solo añadiendo palabras clave a las etiquetas.
+
+1. Control de Tamaño Máximo (El Contenedor)
+Para que la web no se estire infinitamente en monitores gigantes y las imágenes no se vuelvan gigantescas, lo ideal es "encapsular" todo el contenido en un contenedor central.
+
+En el componente principal (App.tsx ) y en el contenedor principal, vamos a modificar max-w-6xl (que limita el ancho) y el mx-auto (que lo centra):
+
+((**Recomendación por ia**: Para lograr ese "encapsulamiento" perfecto y unificar el control del tamaño, vamos a mover esas reglas a un contenedor padre único.
+
+Sigue estos pasos en tu archivo:
+    1. Modifica el Div de Fondo
+    2. Crea el Contenedor Maestro (El "Wrapper")
+    3. Limpia las clases de tus etiquetas actuales
+))
+
+¿Qué has ganado con esto?
+    Consistencia: Si mañana quieres que la web sea un poco más ancha, solo cambias max-w-6xl en un solo sitio en lugar de tres.  
+
+    Seguridad Visual: Al usar px-6 en el contenedor padre, te aseguras de que en teléfonos móviles el contenido nunca choque contra los bordes físicos de la pantalla.
+
+    Orden de Prioridad: Ahora, el CSS de Tailwind sabe exactamente que hay un marco de trabajo (el wrapper) y todo lo que está dentro se ajusta a él.
+    
