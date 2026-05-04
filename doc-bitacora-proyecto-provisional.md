@@ -292,3 +292,21 @@ Sigue estos pasos en tu archivo:
 
     Orden de Prioridad: Ahora, el CSS de Tailwind sabe exactamente que hay un marco de trabajo (el wrapper) y todo lo que está dentro se ajusta a él.
     
+2. Limpieza de archivos archivos 
+Limpiamos:
+    - Archivos de configuración antiguos de Tailwind v3 ((en una instalación de v4 es posible que sea lo que está rompiendo los "estilos" en VerceL)).
+        Dentro de la carpeta client:
+        Borramos:  tailwind.config.js, postcss.config.js
+
+3. Re-Configuramos index.css
+    Borramos:
+        @tailwind base;
+        @tailwind components;
+        @tailwind utilities;
+    Por
+    CSS
+        @import "tailwindcss";
+
+**NOTA IMPORTANTE**: ¿Por qué se veía "blanco" la web? 
+Al tener instalada la versión 4 de Tailwind pero usando las directivas de la versión 3 (o viceversa), el compilador fallaba silenciosamente y generaba un archivo CSS vacío. 
+Vercel lo intenta desplegar, pero sin estilos.
