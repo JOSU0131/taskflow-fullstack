@@ -24,7 +24,7 @@ Necesitaremos:
     Tráfico Web: Cualquier otra cosa que pida el usuario (la página de inicio, el formulario, etc.) será dirigida a la carpeta de la web (/client/dist/).
 
 
-- Código JSON en vercerl.json   
+- (editado) Código JSON en vercerl.json   
 {
   "version": 2,
   "rewrites": [
@@ -34,18 +34,7 @@ Necesitaremos:
     },
     {
       "source": "/(.*)",
-      "destination": "/client/dist/$1"
-    }
-  ],
-  "builds": [
-    {
-      "src": "server/index.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
+      "destination": "/client/$1"
     }
   ]
 }
@@ -82,7 +71,42 @@ Debemos corregir:
             module.exports = app;
 
 
+## **IMPORTANTE**
+Los dos archivos vercel.json estabam peleando entre sí, el de la raiz del proyecto estaba mal configurado y "peleando" con el de la carpeta client.
 
+Para que el Frontend (React) y el Backend (Node) convivan:
+
+1. El cambio PRINCIPAL. En el Root Directory de Vercel
+En el panel de Vercel (Settings > General), cambiaomos el Root Directory de client a la RAÍZ (./).
+
+2. Borramos el vercel.json de la carpeta client
+
+3. Editamos el vercel.json en la RAIZ del proyecto
+Este archivo se encargará de dirigir el "tráfico": las llamadas a la API van al servidor, y el resto al cliente:
+  JSON
+    {
+      "version": 2,
+      "rewrites": [
+        {
+          "source": "/api/(.*)",
+          "destination": "/server/index.js"
+        },
+        {
+          "source": "/(.*)",
+          "destination": "/client/$1"
+        }
+      ]
+    }
+
+Por qué: Como ahora el vercel.json de la raíz controla tanto el /server como el /client, Vercel necesita ver correctamente la estructura.
+
+- ¿Qué estaba rompiendo el despliegue?
+    Conflicto de "Rewrites": El archivo vercel.json de la raíz estabamos diciento que todo lo que no sea /api vaya a /client/dist/$1. Pero el de la carpeta client decia que todo vaya a /index.html. Vercel se mareaba y terminaba no encontrando el punto de entrada.  
+    
+    La ruta /client/dist/$1: era un error muy peligroso. Si tu Root Directory en el panel de Vercel sigue siendo client, Vercel ya está "parado" dentro de esa carpeta. Al decirle que busque en /client/dist, ¡está buscando en client/client/dist! No va a encontrar nada.
+      
+    Configuración de Build duplicada: 
+    El package.json de cliente ya sabe que usa Vite. Al definir un "builds": [...] manual en la raíz con @vercel/static-build, estabamos anulando la detección automática de Vite y forzando un proceso que probablemente no coincida con lo que Vite espera. 
 
 - Ventajas: En resumen, los beneficios para tu proyecto son:
     Dominio Único: Todo vive bajo tu-web.vercel.app. Se acabaron los problemas de conexión entre diferentes direcciones.  
