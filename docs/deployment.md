@@ -141,19 +141,55 @@ Por qué: Como ahora el vercel.json de la raíz controla tanto el /server como e
     Al configurar así, Vercel dejará de intentar servir archivos .tsx (que causaban el error de pantalla blanca) y empezará a servir los archivos .js procesados que el navegador sí entiende.
 
 
-- Fallo persiste:
+## Fallo persiste:
     Ahora tenemos el siguiente problema: el Frontend no encuentra al Backend (Error 404 en /api/miniatures)
-    1.
-
-    2. Segunda Parte.
+      
+    Encontramos el problema
     ¡AL FIN! Aquí estaba "el choque de mundos": los datos (las miniaturas) estaban en el Frontend (client/src/data/mockData.ts), pero el Backend (server) no sabe que esos datos existen porque están en una carpeta totalmente distintas.
 
-    El React pedia datos al servidor en /api/miniatures, el miniatureController.getAll buscaba datos en la carpeta **server**, no encuentraba nada (porque no hay carpeta data ahí) y respondía con un array vacío []
+    El React pedia datos al servidor en /api/miniatures, el miniatureController.getAll buscaba datos en la carpeta **server**, no encuentraba nada (porque no hay carpeta data ahí) y respondía con un array vacío [].
 
-### Ventajas: En resumen, los beneficios para tu proyecto son:
+### Resumen del Problema. fix final
+  "Síntomas":
+    - Error Inicial: El frontend devolvía errores de tipo MIME y 404 al intentar cargar el servidor
+          
+    - API Vacía (ruta: server\controllers\miniatureController.js): 
+      Al acceder a /api/miniatures, el navegador mostraba corchetes vacíos [], indicando que el backend estaba vivo pero sin datos.
+          
+    - Build Fallido: 
+      Errores de compilación en Vercel por falta de dependencias de Tailwind v4 (@tailwindcss/vite).
+
+- Diagnóstico y Hallazgos
+    - Desconexión de Rutas: 
+      Vercel no sabía que debía ejecutar server/index.js como una función de Node.js porque faltaba la configuración de builds en la raíz (taskflow5-fullproyecto-ideaNegocio\vercel.json)
+
+    - Datos Volátiles en API: 
+      El controlador del servidor (miniatureController.js) iniciaba con un array vacío let miniatures = [];. Al ser un entorno serverless, cualquier cambio manual en memoria se perdía, y el servidor no tenía acceso a los "Mock Data" que estaban en la carpeta del cliente.
+    
+    - Fallo en rutas de Imágenes: 
+      Las imágenes estaban en src/assets, una carpeta que desaparece tras la compilación, impidiendo que el servidor las encontrara en producción
+
+- Solución
+    1. Configuración Maestra (vercel.json): 
+      Creamos un archivo en la raíz para orquestar "*ambos mundos*" (vercel.json), definiendo el backend con "use": "@vercel/node" y el frontend con "@vercel/static-build".
+
+    2. Persistencia de Datos: 
+      Movimos los datos de prueba directamente al controlador del servidor para asegurar que siempre estuvieran disponibles al "despertar" la función.
+    
+      2.1. Gestión de Estáticos: 
+      Movimos las imágenes a client/public/images para que fueran accesibles mediante URLs directas permanentes.
+    
+    3. Soporte Tailwind v4 **MUY IMPORTANTE**: 
+      Instalamos @tailwindcss/vite y ajustamos el vite.config.ts para que la compilación de estilos fuera compatible con Vercel
+
+## Ventajas: En resumen, los beneficios para tu proyecto son:
     Dominio Único: Todo vive bajo tu-web.vercel.app. Se acabaron los problemas de conexión entre diferentes direcciones.  
 
     Adiós a Localhost: El frontend ya no busca un servidor en tu ordenador, sino que busca "dentro de sí mismo" a través de la ruta /api.  
 
     Despliegue Atómico: Cuando haces un git push, Vercel actualiza tanto la base de datos/lógica (server) como el diseño (client) al mismo tiempo.
+
+## Resumen 2.0
+
+Para desplegar un proyecto Fullstack en un solo repositorio de Vercel, no basta con subir el código. Hay que explicarle a Vercel dónde termina el cliente y dónde empieza el servidor mediante un vercel.json, asegurar que el servidor (API) tenga sus propios datos y mover las imágenes a una carpeta pública para que el navegador pueda verlas.
 
