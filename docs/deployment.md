@@ -141,6 +141,10 @@ Por qué: Como ahora el vercel.json de la raíz controla tanto el /server como e
     Al configurar así, Vercel dejará de intentar servir archivos .tsx (que causaban el error de pantalla blanca) y empezará a servir los archivos .js procesados que el navegador sí entiende.
 
 
+- Fallo persiste:
+    Ahora tenemos el siguiente problema: el Frontend no encuentra al Backend (Error 404 en /api/miniatures)
+
+
 ### Ventajas: En resumen, los beneficios para tu proyecto son:
     Dominio Único: Todo vive bajo tu-web.vercel.app. Se acabaron los problemas de conexión entre diferentes direcciones.  
 
