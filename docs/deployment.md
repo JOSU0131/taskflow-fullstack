@@ -143,7 +143,12 @@ Por qué: Como ahora el vercel.json de la raíz controla tanto el /server como e
 
 - Fallo persiste:
     Ahora tenemos el siguiente problema: el Frontend no encuentra al Backend (Error 404 en /api/miniatures)
+    1.
 
+    2. Segunda Parte.
+    ¡AL FIN! Aquí estaba "el choque de mundos": los datos (las miniaturas) estaban en el Frontend (client/src/data/mockData.ts), pero el Backend (server) no sabe que esos datos existen porque están en una carpeta totalmente distintas.
+
+    El React pedia datos al servidor en /api/miniatures, el miniatureController.getAll buscaba datos en la carpeta **server**, no encuentraba nada (porque no hay carpeta data ahí) y respondía con un array vacío []
 
 ### Ventajas: En resumen, los beneficios para tu proyecto son:
     Dominio Único: Todo vive bajo tu-web.vercel.app. Se acabaron los problemas de conexión entre diferentes direcciones.  
