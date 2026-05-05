@@ -108,7 +108,40 @@ Por qué: Como ahora el vercel.json de la raíz controla tanto el /server como e
     Configuración de Build duplicada: 
     El package.json de cliente ya sabe que usa Vite. Al definir un "builds": [...] manual en la raíz con @vercel/static-build, estabamos anulando la detección automática de Vite y forzando un proceso que probablemente no coincida con lo que Vite espera. 
 
-- Ventajas: En resumen, los beneficios para tu proyecto son:
+4. El Fallo Persiste. El problema con el package.json en la raíz
+  Aun está dando problemas con el Framework (React con Vite).
+
+    **En la tarea actual**: Tenemos una carpeta client con archivos .tsx (TypeScript + React). Estos archivos no son legibles para el navegador; necesitan ser procesados por Vite para convertirse en JavaScript real
+  
+    Explicación: Si dejamos el package.json de la raíz vacío o configurado solo para el servidor, Vercel nunca ejecutará el comando de construcción de React. Por eso intentaba servir los archivos .tsx directamente, provocando el error que viste en la consola.
+
+  - **NOTA IMPORTANTTE** PASOS para Solución
+
+    1. Configuración de Comandos (Build & Deployment, en Vercel)
+    Añadimos las instrucciones manualmente:
+    - Un **Build Command**: 
+        Activa el interruptor de "Override" a la derecha y escribimos:
+        cd client && npm install && npm run build
+    - **Output Directory**: 
+        Activamos el interruptor de Override:
+        client/dist
+    - **Install Command**: Activamos el interruptor de Override y dejamos el espacio vacío (en algunos casos escribiremos "npm install")
+
+    2. Verificar el Root directory en Vercel
+    Verificamos que El Root Directory ya marque "./". Lo dejamos igual, porque el archivo "vercel.json" maestro está actualmente en la raíz y queremos que Vercel controle todo desde ahí.
+
+
+    ¿Por qué hacemos todo esto?
+    Al estar en un Monorepo, con estos "comandos" + Overide le ordenamos a Vercel literalmente: *"Entra en la carpeta client, instala las cosas ahí, construye el proyecto y busca el resultado final en la carpeta dist que está dentro de client"*.
+
+- **Resumen** 
+    Lo que estamos haciendo es "engañar" a Vercel. Como él espera un proyecto simple en la raíz y tenemos uno complejo (Fullstack), usamos el panel de control de su web para darle la dirección exacta de dónde está el código de React (client) y dónde debe dejar el resultado final (client/dist).
+
+    Conclusión
+    Al configurar así, Vercel dejará de intentar servir archivos .tsx (que causaban el error de pantalla blanca) y empezará a servir los archivos .js procesados que el navegador sí entiende.
+
+
+### Ventajas: En resumen, los beneficios para tu proyecto son:
     Dominio Único: Todo vive bajo tu-web.vercel.app. Se acabaron los problemas de conexión entre diferentes direcciones.  
 
     Adiós a Localhost: El frontend ya no busca un servidor en tu ordenador, sino que busca "dentro de sí mismo" a través de la ruta /api.  
