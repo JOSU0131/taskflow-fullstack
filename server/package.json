@@ -1,17 +1,20 @@
 {
-  "name": "server",
+  "name": "hammerflow-server",
   "version": "1.0.0",
-  "description": "",
+  "description": "Backend Express para HammerFlow Forge",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "dev": "node index.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["express", "api", "hammerflow"],
+  "author": "Josu",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.6",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   }
 }

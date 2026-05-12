@@ -178,7 +178,7 @@ Modificando "App.tsx" ir docs/hooks.md
 # Paso 8: Context y estado global
 Ir a docs/context.md
 
-## Paso 8.2: Recordatoeio despliegue Vercel
+# Paso 8.2: Recordatior despliegue Vercel
 
 1. Instalación de Vercel CLI
 Abre la terminal integrada en VS Code (puedes usar Ctrl + Ñ) y escribe:
@@ -266,7 +266,7 @@ En nuestro lab/proyecto **HammerFlow Forge**, esto consistirá en:
     2. Un formulario de contacto o reserva para los artistas.
     3. Validación y Control
 
-# Paso Extra. Fallo en Estética 
+# Paso Extra. Estética 
 Dado que el proyecto había heredado una estética "plana" al clonar/hacer pull del proyecto anterior en github. Ese proyecto habia sido inicializado usando el comando de **Vite** para crear un entorno de React con TypeScript.
 
 
@@ -344,9 +344,410 @@ Estado Final: Una vez unificado el lenguaje (todo a titulo) y limpiado los archi
 
     Sincronización de Repositorio: Se confirma que GitHub y Vercel están sincronizados (35 commits en total). Los cambios en la carpeta client se despliegan de forma independiente a la carpeta server.
 
+# Paso 11. Backend - Auditoría y arreglo del POST
+Ir a /docs/api.md para el detalle. Resumen rápido aquí:
+
+- 1. Bug detectado en server/controllers/miniatureController.js
+    El controller validaba **`nombre`** y **`precio`** del body, pero el frontend desde el inicio enviaba **`titulo`** (alineado a la interfaz `BaseItem`). Resultado: cualquier POST devolvía 400 "Nombre y precio son obligatorios" en silencio. El bug estaba "tapado" porque en NuevoProducto.tsx había un `as any` que evitaba el error de TypeScript en build, pero la petición real al servidor nunca creaba nada.
+
+    **NOTA**: el frontend mostraba el toast verde de "✅ Unidad forjada" porque la validación cliente pasaba. Pero al recargar la galería, la pieza no aparecía porque el backend la había rechazado.
+
+- 2. Refactor del controller
+    Implementé una función `validarMiniatura(data)` que valida según el campo `tipo` (Unión Discriminada):
+        - VENTA → exige `precio` > 0 y `stock` >= 0
+        - MECENAZGO → exige `meta` > 0, `recaudado` >= 0, `fechaFin` válida
+        - TUTORIAL → exige `precio` > 0, `duracion` y `nivel` ('Básico'|'Intermedio'|'Avanzado')
+
+    Mensaje de error específico para cada caso, devuelto como `{ message: "..." }` con código 400.
+
+- 3. Endpoint nuevo: GET /api/miniatures/:id
+    Antes solo había `getAll`. Hacía falta este para la página de detalle.
+    Devuelve 404 si no existe el id.
+
+- 4. PUT/DELETE
+    Estaban definidos en routes pero sin uso real. Ahora también pasan por la misma `validarMiniatura` cuando hace falta.
 
 
-# Paso 15: Rediseño visual en rama separada".
 
-Paso extra. Mejora UI/UX y Refactorización con IA Claude
+# Paso 11.2. Documentación de la API con Swagger (Bonus)
+Bonus del enunciado: documentación de la API con Swagger/OpenAPI.
+
+- 1. Instalación
+    Bash (en carpeta /server):
+        npm install swagger-ui-express swagger-jsdoc
+
+    NOTA: swagger-ui-express expone una interfaz web para "probar" la API,
+    swagger-jsdoc genera el JSON OpenAPI a partir de los comentarios JSDoc de las routes.
+
+- 2. Archivo server/swagger.js
+    Define el "esquema" de la API: schemas de BaseItem, ItemVenta, ItemMecenazgo, ItemTutorial y la unión `HammerItem` con `oneOf`.
+
+- 3. Anotaciones en server/routes/miniatures.js
+    Añadidos comentarios JSDoc con `@openapi` que describen cada endpoint.
+
+- 4. Montaje en server/index.js
+    JavaScript:
+        app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+        app.get('/api/docs.json', (req, res) => res.json(swaggerSpec));
+
+- 5. Acceso
+    En desarrollo: http://localhost:4000/api/docs
+    En producción (Vercel): /api/docs
+
+
+
+# Paso 12. Capa de red en el frontend (mejora del cliente)
+
+- 1. Nuevo archivo src/types/api.ts
+    Antes los errores se "perdían" como strings. Creé:
+        - `ApiErrorBody` (lo que devuelve el server: `{ message: string }`)
+        - clase `ApiError extends Error` con `.status` (código HTTP) y `.body`
+
+    NOTA: extender `Error` permite usar `if (err instanceof ApiError)` en cualquier
+    componente para distinguir entre "el server me dio 404" y "no hay red".
+
+- 2. Refactor de src/api/miniatureService.ts
+    - Añadidos: `getById(id)`, `update(id, partial)`, `delete(id)`
+    - Helper `processResponse<T>(response)` que centraliza el manejo de errores:
+      si `response.ok` devuelve el JSON tipado, si no, lanza `ApiError`.
+    - URL configurable con `import.meta.env.VITE_API_URL` para que en producción
+      apunte al server desplegado y no a localhost (el bug que tuvimos en Vercel).
+
+- 3. Helper `HammerItemSinId` en types/miniatures.ts
+    PROBLEMA: `Omit<HammerItem, 'id'>` rompía la unión discriminada. TypeScript veía:
+        Omit<{tipo:'VENTA',...} | {tipo:'MECENAZGO',...} | {tipo:'TUTORIAL',...}, 'id'>
+    y "colapsaba" la unión, perdiendo la relación entre `tipo` y los campos específicos.
+    Resultado: errores TS2353 al hacer `{ tipo: 'VENTA', precio: 50, stock: 1 }`.
+
+    SOLUCIÓN: Conditional type DISTRIBUTIVO:
+    TypeScript:
+        export type HammerItemSinId = HammerItem extends infer T
+          ? T extends HammerItem
+            ? Omit<T, 'id'>
+            : never
+          : never;
+
+    Esto fuerza a TS a aplicar `Omit` a cada miembro de la unión por separado.
+
+    NOTA: este patrón es común en TS cuando se tienen uniones discriminadas y se
+    necesita "transformar" cada variante. Lo googlee como "distributive conditional types".
+
+
+
+# Paso 12.2. Mejoras del Custom Hook useProductos
+
+- 1. Búsqueda con debounce
+    Añadido un nuevo state `busqueda` que se filtra por título o autor. Para no
+    filtrar en cada tecla, paso el valor por un nuevo hook `useDebounce`.
+
+    NOTA: el filtrado combinado (categoría + búsqueda) se hace en un único
+    `useMemo` para no rerenderizar de más.
+
+- 2. Persistencia de la categoría seleccionada
+    Sigue como estaba: localStorage. Esto NO es "datos de negocio", es preferencia
+    de UI, así que es correcto que viva en el navegador (no contradice el paso 12).
+
+
+
+# Paso 12.3. Nuevos hooks (Bonus: segundo custom hook)
+
+- 1. useDebounce<T>(valor: T, delayMs?: number): T
+    Hook genérico que retrasa la actualización de un valor. Lo usa el buscador
+    para no filtrar en cada tecla pulsada.
+
+    Implementación: `useEffect` con `setTimeout` y cleanup que cancela el timeout
+    anterior si el valor cambia antes de que expire.
+
+- 2. useFavoritos()
+    Gestiona ids de favoritos con persistencia en localStorage:
+        - `favoritos: string[]` (los ids)
+        - `esFavorito(id): boolean`
+        - `toggleFavorito(id)`
+        - `limpiarFavoritos()`
+
+    NOTA importante: solo los IDS viven en localStorage. Los datos completos
+    siguen siendo "fuente de verdad" del backend. Si una mini se borra del server,
+    el id favorito simplemente no encuentra match y desaparece de la página de
+    Favoritos. Esto evita tener datos desincronizados entre cliente y server.
+
+
+
+# Paso 8. (Por fin) Context API: FavoritosContext
+
+Implementación pendiente del paso 8. Lo encajé ahora porque tiene sentido junto
+con el sistema de favoritos.
+
+- 1. src/context/FavoritosContext.tsx
+    Context que expone los favoritos a TODA la app. Lo necesitan:
+        - La MiniaturaCard (para pintar el corazón rellenado o vacío)
+        - El Navbar (para el contador de favoritos)
+        - La página /favoritos (para listar)
+
+    Sin Context, habría que pasar `favoritos`, `toggleFavorito`, etc. por props
+    desde App.tsx hasta cada nieto. Eso es prop drilling y se vuelve infumable.
+
+- 2. Patrón usado
+    TypeScript:
+        const FavoritosContext = createContext<Value | null>(null);
+        export const FavoritosProvider = ({ children }) => {
+            const value = useFavoritos();
+            return <FavoritosContext.Provider value={value}>{children}</FavoritosContext.Provider>;
+        };
+        export const useFavoritosContext = () => {
+            const ctx = useContext(FavoritosContext);
+            if (!ctx) throw new Error('Debe usarse dentro de <FavoritosProvider>');
+            return ctx;
+        };
+
+    NOTA: el `null` inicial + el throw del hook hacen que si por error consumes
+    el contexto fuera del Provider, el error es inmediato y claro en consola
+    en lugar de un `cannot read property of null` críptico.
+
+- 3. Montaje
+    Envolví toda la app en `<FavoritosProvider>` dentro de `App.tsx`, fuera del
+    Router para que el state sobreviva a cambios de ruta.
+
+
+
+# Paso Detalle. Ruta /producto/:id (la que estaba vacía)
+
+- 1. Nueva página src/pages/DetalleProducto.tsx
+    Antes la ruta `/producto/:id` solo mostraba "Cargando datos del guerrero..."
+    sin componente real. Ahora:
+        - Lee el `id` con `useParams`
+        - Llama a `miniatureService.getById(id)` en useEffect
+        - Maneja los 3 estados de red (cargando, error, datos)
+        - Si el backend devuelve 404 (instanceof ApiError && status===404),
+          muestra mensaje específico
+        - Renderiza un layout grande de 2 columnas con imagen + datos
+        - Bloque CTA distinto por TIPO (botón naranja para VENTA, blanco para
+          MECENAZGO, azul para TUTORIAL)
+        - FavoritoButton arriba a la derecha de la imagen
+
+- 2. Link desde MiniaturaCard
+    La card entera ahora es un `<Link to={'/producto/'+item.id}>`.
+    El botón de favorito hace `e.preventDefault()` + `e.stopPropagation()`
+    para que pulsar el corazón NO navegue.
+
+
+
+# Paso 10.2. Refactor de NuevoProducto (3 tipos de verdad)
+
+Antes el formulario fingía soportar tipos pero forzaba `tipo: 'VENTA'` con un
+`as any`. Ahora:
+
+- 1. Selector de tipo
+    3 botones grandes arriba: VENTA / MECENAZGO / TUTORIAL.
+
+- 2. Campos dinámicos
+    Bajo el bloque común (título/autor/imagen/categoría) aparecen los campos
+    específicos según el tipo:
+        - VENTA → precio, stock
+        - MECENAZGO → meta, recaudado, fechaFin (input type="date")
+        - TUTORIAL → precio, duración, nivel
+
+- 3. Construcción tipada del item
+    Función `construirItem(): HammerItemSinId | null` que valida y devuelve un
+    objeto que cumple la unión discriminada SIN `as any`.
+
+- 4. UX de éxito
+    Antes mostraba toast verde y limpiaba campos. Ahora redirige a
+    `/producto/{id-creado}` con `useNavigate()`. Más natural.
+
+
+
+# Paso Estética 2. Mejoras visuales y UX
+
+- 1. Hero (src/components/Hero.tsx)
+    Sección de bienvenida con gradiente, glows difuminados (`blur-3xl`) y CTAs
+    grandes. Solo en la home.
+
+- 2. Navbar (src/components/Navbar.tsx)
+    Barra superior sticky con backdrop-blur. Logo, links a Galería / Favoritos /
+    Forjar. Contador rojo encima del link de Favoritos cuando hay alguno.
+    Usa `<NavLink>` de React Router para resaltar el link activo en naranja.
+
+- 3. SkeletonCard (src/components/SkeletonCard.tsx)
+    Reemplaza el spinner-único por una rejilla de "huesos" animados que
+    imitan la estructura de las cards reales. Mejor UX percibido.
+
+- 4. Buscador (src/components/Buscador.tsx)
+    Input con icono de lupa SVG. Coherente con la paleta dark + naranja.
+
+- 5. MiniaturaCard mejorada
+    - Hover: `translate-y` ligero, borde naranja y `scale-105` en la imagen
+    - Badge superior con color por tipo (naranja VENTA, púrpura MECENAZGO, azul TUTORIAL)
+    - FavoritoButton flotante
+    - Gradiente oscuro abajo para legibilidad
+    - `loading="lazy"` en las imágenes (mejora First Paint)
+
+- 6. Estado vacío en Home
+    Cuando los filtros no devuelven nada, muestro una card punteada con
+    "🔍 Ningún resultado coincide" en vez de un grid vacío.
+
+
+
+# Paso 4.2. Refactor de App.tsx + Lazy Loading (Bonus: React.lazy)
+
+Antes App.tsx tenía toda la lógica de la home dentro (filtros, grid, gestión
+de errores) y además había un Home.tsx duplicado que no se usaba.
+
+- 1. Limpieza
+    App.tsx ahora es solo: providers + layout + routing. Cada página vive en
+    su propio archivo y se importa.
+
+- 2. Lazy loading con React.lazy
+    TypeScript:
+        const Home = lazy(() => import('./pages/Home'));
+        const DetalleProducto = lazy(() => import('./pages/DetalleProducto'));
+        const NuevoProducto = lazy(() => import('./pages/NuevoProducto'));
+        const Favoritos = lazy(() => import('./pages/Favoritos'));
+        const NotFound = lazy(() => import('./pages/NotFound'));
+
+    Y envuelto en `<Suspense fallback={<RouteFallback />}>` con un spinner
+    pequeño.
+
+    NOTA: ¿qué gano? Vite genera un chunk JS por cada página. El navegador solo
+    descarga el chunk de la página actual. La galería se ve antes porque el
+    navegador no tiene que parsear el código de NuevoProducto, DetalleProducto
+    ni Favoritos. Comprobado en `npm run build`:
+        Home-CDwsagYe.js                6.13 kB │ gzip:  2.35 kB
+        DetalleProducto-D8XoSRuG.js     5.72 kB │ gzip:  1.86 kB
+        NuevoProducto-BiE--EJT.js       6.65 kB │ gzip:  2.05 kB
+        Favoritos-4mUbSLVA.js           2.32 kB │ gzip:  1.06 kB
+        NotFound-g5KiYIY3.js            0.97 kB │ gzip:  0.54 kB
+
+
+
+# Paso 13. Testing (estuctura nueva: testing manual + tests automáticos)
+
+Detalle completo en /docs/testing.md. Resumen:
+
+- 1. Pruebas manuales realizadas
+    - GET de la galería (3 mocks de seed iniciales)
+    - GET por id (200 y 404)
+    - POST de los 3 tipos (todos con validación)
+    - PUT y DELETE
+    - Filtros de categoría
+    - Búsqueda con debounce (no filtra en cada tecla)
+    - Favoritos (toggle, persistencia, contador, limpiar)
+    - Detalle de producto con id existente y con id inventado (404)
+    - Responsive: 375px (móvil), 768px (tablet), 1280px (desktop)
+
+- 2. Tests automáticos (Bonus)
+    Configuré Vitest + React Testing Library:
+        - vitest.config.ts SEPARADO de vite.config.ts (ver NOTA abajo)
+        - src/test/setup.ts con jest-dom matchers y cleanup global
+        - 10 tests pasando en 3 archivos:
+            * useFavoritos (4 tests)
+            * calcularProgreso (3 tests)
+            * MiniaturaCard (3 tests, con MemoryRouter + FavoritosProvider)
+
+    NOTA — POR QUÉ DOS CONFIGS:
+    Si meto el bloque `test: {...}` dentro de vite.config.ts, el comando
+    `tsc -b` (que se ejecuta antes del `vite build`) lee tsconfig.node.json
+    y NO incluye los tipos de Vitest. Resultado: error TS2769 al hacer build.
+    Hay 2 soluciones: (a) añadir "vitest" a `types` de tsconfig.node.json, o
+    (b) separar configs. Elegí (b) porque mantiene el build de producción
+    libre de dependencias de testing. vitest.config.ts importa Vitest, vite.config.ts no.
+
+    Comando:
+    Bash:
+        npm run test:run
+
+- 3. Bugs detectados y arreglados
+    Lista detallada en /docs/testing.md. Los 5 grandes:
+        1. Backend validaba `nombre` cuando frontend envía `titulo`
+        2. App.tsx duplicaba lógica con pages/Home.tsx (Home no se usaba)
+        3. Ruta /producto/:id estaba vacía
+        4. Formulario solo creaba VENTA aunque el modelo soportaba 3 tipos
+        5. Omit<HammerItem, 'id'> rompía la unión discriminada
+
+
+
+# Paso 15. Retrospectiva (mejorada)
+
+Fui a /docs/retrospective.md y lo amplié. Cubre:
+    - Aprendizajes principales (frontend, backend, capa de red, testing, deploy)
+    - Decisiones arquitectónicas y por qué
+    - Errores que cometí y cómo los resolví
+    - Cómo usé IA durante el desarrollo (puntos donde ayudó, cuándo me equivoqué siguiéndola, qué aprendí del proceso)
+    - Qué me llevo para el próximo proyecto
+
+
+
+# Resumen final del estado
+
+Estructura final del cliente:
+    src/
+      api/        miniatureService.ts (con ApiError tipado)
+      components/ MiniaturaCard, GridProductos, FavoritoButton, Hero, Navbar, Buscador, SkeletonCard
+      context/    FavoritosContext.tsx
+      hooks/      useProductos, useFavoritos (Bonus), useDebounce (Bonus)
+      logic/      hammerLogic.ts (con tests)
+      pages/      Home, DetalleProducto (NUEVO), NuevoProducto (refactor 3 tipos), Favoritos (NUEVO), NotFound
+      types/      miniatures.ts (con HammerItemSinId), api.ts (NUEVO)
+      test/       setup.ts
+
+Estructura final del server:
+    server/
+      controllers/miniatureController.js (validación por tipo)
+      routes/     miniatures.js (con anotaciones OpenAPI)
+      swagger.js  (NUEVO)
+      index.js    (con /api/docs montado)
+
+Comandos importantes:
+    Bash:
+        # Frontend
+        cd client && npm install && npm run dev      # http://localhost:5173
+        cd client && npm run test:run                # Ejecuta todos los tests
+        cd client && npm run build                   # Build de producción
+
+        # Backend
+        cd server && npm install && npm start        # http://localhost:4000
+                                                     # /api/docs  ← Swagger UI
+
+
+# Paso 16. Auditoría final (post-build)
+
+Después de tenerlo todo funcionando, pasé el linter y revisé el código una
+vez más con ojo crítico para pillar lo que se me había escapado.
+
+- 1. Errores reales del linter
+    a) FavoritosContext.tsx exportaba el Provider Y el hook desde el mismo
+       archivo. Esto rompe Fast Refresh de Vite (`react-refresh/only-export-components`).
+       Lo separé en 3 archivos: `favoritosContext.ts` (solo createContext +
+       tipo), `FavoritosProvider.tsx` (solo el componente), `useFavoritosContext.ts`
+       (solo el hook).
+
+    b) En DetalleProducto tenía `setError(...)` y `setEstaCargando(false)`
+       síncronamente DENTRO del body de un `useEffect`. ESLint avisa
+       (`react-hooks/set-state-in-effect`) porque puede causar renders en cascada.
+       Lo arreglé moviendo la validación DENTRO de la función `obtener` async,
+       que ya está fuera del body síncrono.
+
+- 2. Mejoras menores que añadí
+    - `.env.example` para documentar la variable `VITE_API_URL` (la `.env.local`
+      no se sube a git, así que cualquiera que clone el repo no sabe qué hace falta).
+    - `try/catch` en el `setItem` de `useFavoritos`: en modo privado/incógnito
+      `localStorage.setItem` puede lanzar (cuota=0). Mejor que la app no
+      persista a que casque entera.
+    - Formato de precio con `toLocaleString('es-ES')` en MiniaturaCard y
+      DetalleProducto. Para enteros pequeños no cambia nada (`50€`), pero para
+      decimales respeta la coma (`25,99€`) y para miles añade separador
+      (`1.500€`).
+
+- 3. Cosas que detecté pero NO toqué (con motivo):
+    - `<button>` dentro de `<Link>` en MiniaturaCard: técnicamente nested
+      interactive elements. Funciona y es el patrón que usan Wallapop, Spotify,
+      Vinted. La alternativa (div clicable con role="link") es peor.
+    - Tests más profundos para DetalleProducto y useProductos: requieren
+      mockear fetch (con vi.mock o MSW). Es una mejora real pero significativa,
+      pendiente para una siguiente iteración.
+
+- 4. Verificación final
+    Bash:
+        npm run lint        # SIN errores ni warnings
+        npm run build       # SIN errores
+        npm run test:run    # 10/10 tests pasando
 

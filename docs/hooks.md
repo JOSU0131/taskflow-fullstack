@@ -1,162 +1,209 @@
+# Paso 7. Hooks de React
 
-# 1. El Plan de Acción
-Inicialmente, la gestión de la interactividad se planteó directamente en App.tsx. El objetivo era permitir al usuario filtrar las miniaturas por categoría mediante una interfaz reactiva.
+Los hooks son funciones especiales que solo pueden llamarse dentro de
+componentes funcionales (o de otros hooks). Permiten "engancharse" al
+estado y al ciclo de vida de React sin escribir clases.
 
-Vamos a añadir un estado en App.tsx que guarde qué categoría ha seleccionado el usuario. Luego, filtraremos la lista de PRODUCTOS_MOCK antes de pasársela al GridProductos
-
-## Hooks Fundamentales Utilizados:
-**useState**: Lo utilizamos para controlar la interactividad. Permite que React "recuerde" qué categoría ha pulsado el usuario y repinte la interfaz automáticamente al cambiar.
-Una especie de filtrado
-
-**useMemo**: Lo usamos para el filtrado de la lista. Evita que la aplicación tenga que volver a filtrar los cientos (o miles) de productos cada vez que la página se actualiza por otra razón, ahorrando memoria y procesador.
-
-- 1. Modificando App.tsx (con useState y useMemo)
-
-Typescript
-    //0.
-    import { useState, useMemo } from 'react'; // Importamos los Hooks
-
-En function
-    // 1. GESTIÓN DE ESTADO (useState)
-    // Guardamos la categoría seleccionada. 'null' significa "Ver todo".
-    const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<Categoria | null>(null);
-
-    // 2. OPTIMIZACIÓN (useMemo)
-    // Solo recalculamos la lista filtrada si cambia la categoría o los datos.
-    
-    const productosFiltrados = useMemo(() => {
-    if (!categoriaSeleccionada) return PRODUCTOS_MOCK;
-    return PRODUCTOS_MOCK.filter(item => item.categoria === categoriaSeleccionada);
-    }, [categoriaSeleccionada]);
-
-    // 3. Lista de categorías únicas para los botones
-    const categorias: Categoria[] = ['Fantasía', 'Bustos', 'Monstruos', 'Tutorial Pintado'];
-
-    return (...
-    <header> ...
-
-    // 4. BARRA DE FILTROS 
-        <div className="flex flex-wrap gap-3 mt-8">
-          <button 
-            onClick={() => setCategoriaSeleccionada(null)}
-            className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${!categoriaSeleccionada ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
-          >
-            Todos
-          </button>
-          
-          {categorias.map(cat => (
-            <button 
-              key={cat}
-              onClick={() => setCategoriaSeleccionada(cat)}
-              className={`px-4 py-2 rounded-full text-sm font-bold transition-all ${categoriaSeleccionada === cat ? 'bg-orange-500 text-white' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
-            >
-              {cat}
-            </button>
-            ))}
-        </div>
-    </header>
+En HammerFlow Forge uso:
+- Hooks built-in: `useState`, `useEffect`, `useMemo`, `useCallback`, `useContext`, `useParams`, `useNavigate`
+- Custom hooks propios: `useProductos`, `useFavoritos`, `useDebounce`
 
 
-# 2. Añadir Custom Hook y usar useEffect
-Para elevar la calidad del código, encapsulamos toda la lógica en un Custom Hook.
+## 1. Hooks fundamentales utilizados
 
-NOTA:
-*Un Custom Hook es, en esencia, una función de JavaScript/TypeScript que utiliza otros Hooks de React (como useState, useEffect o useMemo) para encapsular una lógica específica.*
+### useState
+Para controlar interactividad. Permite que React "recuerde" valores entre
+renders y se repinte cuando cambian.
 
-Responsabilidades del Hook (en este paso):
+Ejemplos en el proyecto:
+- `useState<HammerItem[]>([])` en useProductos para guardar el catálogo
+- `useState(false)` en NuevoProducto para `enviando`
+- `useState<Categoria | null>(null)` para la categoría seleccionada
 
-useProductos (Custom Hook): Reúne toda la lógica de gestión de datos, estados de carga y filtrado en una sola función reutilizable, manteniendo los componentes visuales limpios.
-    
-useEffect: Se encarga de manejar los "efectos secundarios". En este caso, dispara un temporizador al montar el componente para simular la latencia de una red real.
+### useEffect
+Para efectos secundarios: peticiones HTTP, suscripciones, sincronización con
+APIs del navegador (localStorage), etc.
 
-Typescript
-      // SIMULACIÓN DE CARGA (useEffect)
-    // Usamos useEffect para simular que los datos vienen de una base de datos
-    useEffect(() => {
-    const timer = setTimeout(() => {
-      setEstaCargando(false);
-    }, 1200); // 1.2 segundos de "Loading"
+Ejemplos en el proyecto:
+- Carga inicial de productos en `useProductos` (con dependencias `[]`)
+- Persistencia de la categoría en localStorage cuando cambia
+- Limpieza del timeout en `useDebounce` (con función de cleanup)
 
-useMemo: Memoriza la lista filtrada. Si el usuario cambia de pestaña y vuelve, pero no cambia el filtro, React no pierde tiempo volviendo a filtrar los datos.
+### useMemo
+Para evitar recalcular cosas costosas en cada render. Solo recalcula si
+cambia alguna de sus dependencias.
 
-     // FILTRADO OPTIMIZADO (useMemo)
-    const productosFiltrados = useMemo(() => {
-    if (!categoriaSeleccionada) return PRODUCTOS_MOCK;
-    return PRODUCTOS_MOCK.filter(item => item.categoria === categoriaSeleccionada);
-    }, [categoriaSeleccionada]);   
+Ejemplo: `productosFiltrados` en `useProductos` se recalcula solo si cambia
+`productos`, `categoriaSeleccionada` o `busquedaDebounced`.
 
+### useCallback
+Para evitar que una función se recree en cada render. Útil cuando esa
+función se pasa como prop a un componente hijo memoizado, o se usa como
+dependencia de otro hook.
 
-# 3. Actualizamos App.tsx:
-Para que solo le "pide" las cosas al hook. Ahora usamos un Custom Hook (useProductos), App.tsx no necesita saber de dónde vienen los datos (si están en un archivo local como mockData.ts o si vienen de una base de datos en Internet).
+Ejemplo: `esFavorito` y `toggleFavorito` en `useFavoritos`.
 
-    
-En el paso 0, obtenemmos **Facilidad de Cambio (Mantenibilidad)**
-        Antes: App.tsx buscaba los ingredientes en la despensa (PRODUCTOS_MOCK).
-
-        Ahora: El Hook useProductos es quien va a la despensa. App.tsx simplemente recibe el plato preparado.
-
-Ejemplo:
-    Imagina que mañana decides cambiar tus datos falsos por una API real.
-
-    Si no usaras el Hook: Tendrías que ir a App.tsx y a todos los componentes que usen los datos para cambiar las importacione
-
-El archivo useProductos.ts es ahora el único responsable de leer ese archivo de datos para filtrarlos y gestionar el estado de carga.
+### useContext
+Para consumir un contexto. Lo usamos en `useFavoritosContext`.
 
 
-Typescript
-    0. Eliminamos 
-    import { PRODUCTOS_MOCK } from './data/mockData';
-    
-    Y LO MAS IMPORTANTE ahora usamos
-    import { useProductos } from './hooks/useProductos';
+## 2. Custom Hook 1: `useProductos`
 
-Centralización de la Lógica
-        Antes: En App.tsx tenías que importar useState y useMemo porque la "maquinaria" del filtrado estaba a la vista de todos. El archivo tenía que saber cómo filtrar y cómo gestionar el estado.
+Lógica central de la galería: carga, estado de red, filtros y búsqueda.
 
-        Ahora: Todo eso se ha movido al "cerebro" llamado useProductos. App.tsx ya no necesita saber qué es un useMemo o un useState; solo necesita saber que useProductos le dará la lista de productos ya lista.
+```ts
+const {
+  productosFiltrados,    // Los items filtrados por categoría + búsqueda
+  categoriaSeleccionada, // null o una Categoria
+  setCategoriaSeleccionada,
+  busqueda,
+  setBusqueda,
+  estaCargando,          // boolean
+  error,                 // string | null
+} = useProductos();
+```
 
+Internamente compone tres responsabilidades:
+1. Carga inicial vía `miniatureService.getAllMiniatures()` (un useEffect).
+2. Persistencia de la categoría seleccionada en localStorage (otro useEffect).
+3. Filtrado memoizado: combina categoría + búsqueda con debounce.
 
-    1. Extraemos todo lo necesario de nuestro Custom Hook
-    function App() { 
-    const { 
-    productosFiltrados, 
-    categoriaSeleccionada, 
-    setCategoriaSeleccionada, 
-    estaCargando 
-    } = useProductos();
-
-## Simplificación de Importaciones
-Antes: Tu lista de importaciones crecía con cada nueva funcionalidad de React que necesitabas (como useEffect para la carga o useMemo para el rendimiento).
-
-Ahora: Solo importas una cosa: tu propio Hook useProductos. Esto hace que el código de App.tsx sea mucho más corto y fácil de leer para cualquier desarrollador.
-
-## El concepto de "Caja Negra"
-Este es el cambio más importante en cuanto a mentalidad de programación:
-
-Antes: App.tsx era el responsable de HACER el trabajo (filtrar, contar, cargar).
-
-Ahora: App.tsx es el responsable de MOSTRAR el trabajo. Le pide a useProductos lo que necesita y confía en que el Hook lo hará correctamente.
+NOTA: encapsular toda esta complejidad en un hook hace que `Home.tsx` solo
+tenga que pintar resultados, sin pelearse con fetch ni filtros.
 
 
-**Resumen**
-Al crear useProductos.ts, lo que estás haciendo es crear el "Cerebro" de tu aplicación fuera de la vista visual.
+## 3. Custom Hook 2 (Bonus): `useFavoritos`
 
-    - Estado de la Categoría (useState): Guarda qué filtro ha seleccionado el usuario (Fantasía, Bustos, etc.).
-    - Estado de Carga (useState): Un booleano (true/false) que nos dice si estamos esperando a que los datos se "descarguen".
-    - Simulador de Red (useEffect): Una función que espera poco más de un segundo antes de mostrar los productos, simulando una conexión real a un servidor.
-    - Filtro Inteligente (useMemo): El cálculo que decide qué productos mostrar basándose en la categoría elegida, pero que solo se repite si el usuario cambia el filtro.
+Gestiona la lista de ids favoritos con persistencia en localStorage.
 
-# 4. Resumen técnico
-En esta fase del desarrollo, hemos migrado la lógica de la aplicación desde un modelo monolítico en App.tsx hacia un modelo basado en Custom Hooks. Esta transición mejora la escalabilidad, la legibilidad y la separación de responsabilidades del proyecto.
+```ts
+const {
+  favoritos,         // string[] de ids
+  esFavorito,        // (id: string) => boolean
+  toggleFavorito,    // (id: string) => void
+  limpiarFavoritos,  // () => void
+} = useFavoritos();
+```
 
-### Tabla comparativa de Evolución Arquitectónica
+Implementación clave:
 
-Característica              Implementación Anterior (Estándar)                          Implementación Actual (Profesional)
+```ts
+const [favoritos, setFavoritos] = useState<string[]>(() => leerFavoritos());
 
-Ubicación de la Lógica	    Dispersa dentro de los componentes visuales (App.tsx).	        Centralizada en el Custom Hook useProductos.t
+useEffect(() => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(favoritos));
+}, [favoritos]);
 
-Gestión de Importaciones	Múltiples hooks nativos (useState, useMemo, useEffect).	        Un único punto de entrada: useProductos.
+const toggleFavorito = useCallback((id: string) => {
+  setFavoritos(prev =>
+    prev.includes(id) ? prev.filter(f => f !== id) : [...prev, id]
+  );
+}, []);
+```
 
-Estado de Carga	            Inexistente (la app parpadeaba al cargar).	                    Sincronizado mediante un booleano estaCargando.
+NOTA importante: solo los IDs viven en localStorage. Los datos completos
+siguen siendo fuente de verdad del backend. Si el server elimina una
+miniatura, su id favorito simplemente "no encuentra match" cuando vamos a
+la página /favoritos. Esto evita tener datos desincronizados.
 
-Mantenibilidad	            Alta dificultad; riesgo de "Prop Drilling" y archivos extensos.	    Alta eficiencia; lógica aislada de la interfaz de usuario.
+
+## 4. Custom Hook 3 (Bonus): `useDebounce<T>`
+
+Hook genérico que retrasa la actualización de un valor. Lo usa el buscador
+para no filtrar en cada tecla pulsada (sería ineficiente y daría tirones
+visuales).
+
+```ts
+export function useDebounce<T>(valor: T, delayMs: number = 300): T {
+  const [valorDebounced, setValorDebounced] = useState<T>(valor);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => setValorDebounced(valor), delayMs);
+    return () => clearTimeout(timeoutId); // Cancela si el valor cambia antes
+  }, [valor, delayMs]);
+
+  return valorDebounced;
+}
+```
+
+Uso:
+```ts
+const [texto, setTexto] = useState('');
+const textoDebounced = useDebounce(texto, 250);
+// textoDebounced solo se actualiza 250ms después de la última pulsación
+```
+
+NOTA: la función de cleanup del useEffect es la pieza clave. Cada vez que
+el usuario teclea, se cancela el setTimeout anterior. Solo cuando deja de
+teclear durante 250ms, el setTimeout completa y `setValorDebounced` corre.
+
+
+## 5. Por qué los custom hooks importan
+
+Antes de los custom hooks, la lógica como "carga + filtra + persiste" se
+escribía directamente en el componente. Resultados:
+- El componente era enorme y mezclaba presentación con lógica.
+- Difícil de reusar.
+- Difícil de testear (necesitas renderizar el componente para probar la lógica).
+
+Con custom hooks:
+- El componente queda corto y enfocado en pintar.
+- La lógica se reusa (ej: `useDebounce` lo podría usar otro buscador en otra parte).
+- Se testea sin pintar nada (ver `useFavoritos.test.ts`).
+
+
+---
+
+# Actualización: Custom hooks finales
+
+## useProductos (refactorizado)
+
+Sigue siendo el hook principal de la galería pero ahora también gestiona
+la búsqueda con debounce.
+
+Devuelve:
+- `productos`, `productosFiltrados`
+- `categoriaSeleccionada`, `setCategoriaSeleccionada`
+- `busqueda`, `setBusqueda` (NUEVO)
+- `estaCargando`, `error`
+
+NOTA: el filtrado combina categoría + búsqueda en un único `useMemo` que
+solo se recalcula cuando alguna de las 3 dependencias cambia (productos,
+categoriaSeleccionada, busquedaDebounced).
+
+## useFavoritos (Bonus: segundo custom hook)
+
+Hook que gestiona la lista de ids favoritos del usuario con persistencia
+en localStorage.
+
+Devuelve:
+- `favoritos: string[]` — los ids guardados
+- `esFavorito(id): boolean`
+- `toggleFavorito(id)`
+- `limpiarFavoritos()`
+
+Decisión técnica: solo guardamos los ids. Los datos completos siempre vienen
+del backend. Si una pieza se borra del server, el id favorito simplemente no
+encuentra match y desaparece visualmente.
+
+Lo envolvemos en `FavoritosContext` para que cualquier componente del árbol
+pueda consumirlo sin prop drilling.
+
+## useDebounce<T>(valor, delayMs?)
+
+Hook genérico de utilidad. Retrasa la actualización del valor X ms.
+
+```ts
+const [texto, setTexto] = useState('');
+const textoDebounced = useDebounce(texto, 250);
+```
+
+Implementación: `useEffect` con `setTimeout` y cleanup que cancela el
+timeout anterior si el valor cambia antes de que expire.
+
+Ventajas frente a hacerlo "a mano" en cada componente:
+- Reutilizable (lo usamos en useProductos para el buscador, podríamos
+  usarlo en cualquier otro filtro en tiempo real).
+- Genérico con `<T>`: funciona con strings, números o lo que sea.
+- Sin dependencias externas.
+

@@ -4,9 +4,11 @@ import { DateTime } from 'luxon';
 export const obtenerEstadoMecenazgo = (fechaFin: string): string => {
   const fin = DateTime.fromISO(fechaFin);
   const ahora = DateTime.now();
-  
+
+  if (!fin.isValid) return "Campaña Finalizada";
+
   const diasRestantes = Math.ceil(fin.diff(ahora, 'days').days);
-  
+
   if (diasRestantes <= 0) return "Campaña Finalizada";
   return `Quedan ${diasRestantes} días`;
 };

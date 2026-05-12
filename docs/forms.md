@@ -1,312 +1,140 @@
-# Paso 10: La Forja de Datos
-
-Vamos a empezar por crear un formulario para "Añadir una nueva Miniatura". Esto nos servirá para entender cómo React "escucha" lo que el usuario escribe.
-
-    Concepto Clave: Componentes Controlados
-    En React, los formularios son "controlados". Esto significa que cada letra que escribes en un input se guarda inmediatamente en el Estado (useState). **React** es el dueño absoluto de lo que aparece en pantalla.
-
-## 0. Preparación del terreno
-Necesitamos una nueva página donde "viva" este formulario y actualizar nuestro doc "App.tsx"
-
-1. Creamos un nuevo archivo en src/pages/ llamado NuevoProducto.tsx
-
-2. Nueva ruta en App.tsx para que podamos entrar en /nuevo.
-        - Nuevo import:
-        import NuevoProducto from './pages/NuevoProducto';
-        - Nueva pagina:
-        <Route path="/nuevo" element={<NuevoProducto />} />
-
-NOTA: typescript nos advertirá en App.tsx  "/pages/NuevoProducto has no default export" lo que significa que el sistema intenta importar algo que no existe, al no tener aún codigo export en el doc. NuevoProducto.tsx
-
-3. Creamos la estructura básica en "NuevoProducto.tsx"
-        
-        **NOTA**: NO olvidar añadir codigo de export e import
-        En JavaScript/React, cuando haces un import NuevoProducto from '...', el archivo de destino está obligado a tener una línea que diga "export default". Si el archivo está en blanco, el import se queda "colgado".
-
-- Typescript. // Primera versión del formulario en pagina-documento "NuevoProducto.tsx"
-        import { useState } from 'react';
-        import { Link } from 'react-router-dom';
-
-    // linea de codigo para el export hacia el doc App.tsx
-        export default function NuevoProducto() {
-
-    // Estado para el nombre de la miniatura
-        const [nombre, setNombre] = useState('');
-
-        const handleSubmit = (e: React.FormEvent) => {
-            e.preventDefault();
-            alert(`¡Miniatura "${nombre}" lista para la batalla!`);
-        };
-
-        return (
-            <div className="max-w-2xl mx-auto bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-2xl">
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
-                Forjar <span className="text-orange-500">Nueva Unidad</span>
-                </h2>
-                <Link to="/" className="text-slate-400 hover:text-white text-sm font-bold underline">
-                Volver
-                </Link>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                <label className="block text-sm font-bold text-slate-400 mb-2 uppercase">
-                    Nombre de la Miniatura
-                </label>
-                <input 
-                    type="text"
-                    required
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-orange-500 transition-colors"
-                    placeholder="Ej: Dragón Rojo"
-                />
-                </div>
-
-                <button 
-                type="submit"
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-lg uppercase tracking-widest transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-orange-500/20"
-                >
-                Añadir al Inventario
-                </button>
-            </form>
-            </div>
-        );
-        }
-
-## 1. Formulario completo
-Para que este formulario sea "útil" necesitamos que sea un poco más complejo. Los prodcuto es una tienda no solo tienen nombre, también suelen necesitar precio, categoría y quizás una descripción.
-
-1. Ampliamos el formulario en pagina-documento "NuevoProducto.tsx"
-Definimos los Estados (useState). Concepto "cubos", donde el usuario guardara la información que escribe.
-
-    Creamos cuatro estados: nombre, precio, categoria y descripcion.
-    //    Estados para cada campo
-        const [nombre, setNombre] = useState('');
-        const [precio, setPrecio] = useState('');
-        const [categoria, setCategoria] = useState<Categoria | ''>('');
-        const [descripcion, setDescripcion] = useState('');
-    Y   
-        const handleSubmit = (e: React.FormEvent) => {
-            e.preventDefault();
-    // Aquí es donde validaríamos los datos antes de enviarlos
-            console.log({ nombre, precio, categoria, descripcion });
-            alert(`¡El ${nombre} ha sido catalogado por ${precio} un bitcoin!`);
-        };
-
-        **NOTA** ¿Por qué? 
-        En React, si no guardas lo que se escribe en un "estado", la información se pierde cada vez que el componente se actualiza. El estado es la memoria a corto plazo de tu componente.
-
-**NOTA IMPORTANTE** No olvidar añadir
-        // Importamos el tipo que ya creamos
-        import type { Categoria } from '../types/miniatures';
+# Paso 10. Formularios e Interacción (refactor a 3 tipos)
+
+El formulario de "Forjar nueva pieza" (`/nuevo`) es donde la web deja de
+ser una "galería para mirar" y se convierte en una "herramienta para
+trabajar". Esta versión cubre los **3 tipos** del catálogo (VENTA,
+MECENAZGO, TUTORIAL).
+
+
+## 1. Concepto clave: Componentes Controlados
+
+En React, los formularios son "controlados". Cada letra que el usuario
+escribe se guarda inmediatamente en el estado (useState). React es el
+dueño absoluto de lo que aparece en pantalla.
+
+Patrón básico:
+
+```tsx
+const [nombre, setNombre] = useState('');
+
+<input
+  value={nombre}                              // ← controlado por React
+  onChange={(e) => setNombre(e.target.value)} // ← cualquier cambio actualiza el estado
+/>
+```
+
+NOTA: si pongo solo `value=` sin `onChange=`, el input es de "solo lectura".
+Si pongo solo `onChange=` sin `value=`, es un input "no controlado". Lo
+correcto es ambos.
+
+
+## 2. La estructura del formulario refactorizado
+
+```
+┌─────────────────────────────────────────┐
+│  Selector de TIPO (3 botones grandes)    │  ← VENTA / MECENAZGO / TUTORIAL
+├─────────────────────────────────────────┤
+│  Título                                  │  ← común a los 3 tipos
+│  Autor              Categoría            │
+│  URL de imagen                           │
+├─────────────────────────────────────────┤
+│  CAMPOS DINÁMICOS según el tipo:        │  ← cambian según el botón pulsado
+│   VENTA      → precio, stock             │
+│   MECENAZGO  → meta, recaudado, fechaFin │
+│   TUTORIAL   → precio, duración, nivel   │
+├─────────────────────────────────────────┤
+│  Mensaje de error (si lo hay)            │
+│  [ Forjar Producto ]                     │
+└─────────────────────────────────────────┘
+```
+
+
+## 3. Renderizado condicional de los campos
+
+```tsx
+{tipo === 'VENTA' && (
+  <div className="grid grid-cols-2 gap-4">
+    <input ... />  {/* precio */}
+    <input ... />  {/* stock */}
+  </div>
+)}
+
+{tipo === 'MECENAZGO' && (
+  <div className="grid grid-cols-3 gap-4">
+    <input ... />  {/* meta */}
+    <input ... />  {/* recaudado */}
+    <input type="date" ... />  {/* fechaFin */}
+  </div>
+)}
+
+{tipo === 'TUTORIAL' && (
+  <div className="grid grid-cols-3 gap-4">
+    <input ... />     {/* precio */}
+    <input ... />     {/* duracion */}
+    <select ... />    {/* nivel: Básico/Intermedio/Avanzado */}
+  </div>
+)}
+```
+
+
+## 4. Construcción tipada del item
+
+Antes había un `as any` que ocultaba el bug del tipo VENTA forzado. Ahora
+una función pura construye el objeto correcto:
+
+```ts
+const construirItem = (): HammerItemSinId | null => {
+  // Validaciones comunes (titulo, autor, imagen, categoria)
+  // ...
+
+  if (tipo === 'VENTA') {
+    return { ...base, tipo: 'VENTA', precio: p, stock: s };
+  }
+  if (tipo === 'MECENAZGO') {
+    return { ...base, tipo: 'MECENAZGO', meta: m, recaudado: r, fechaFin };
+  }
+  // TUTORIAL
+  return { ...base, tipo: 'TUTORIAL', precio: p, duracion, nivel };
+};
+```
+
+NOTA: el tipo de retorno es `HammerItemSinId` (ver `types/miniatures.ts`),
+que es la unión distributiva `Omit<...>`. Si me equivoco mezclando campos
+(ej: poner `meta` en la rama VENTA), TypeScript me lo dice.
 
-2. Crear los Inputs. Concepto de "componente controlado"
-Un componente controlado es un input que React domina al 100%.
-    
-    A cada <input> le ponemos dos propiedades clave:   
-        value={estado}: Le decimos al input: "Tu valor es exactamente lo que diga mi estado".
-        Y
-        onChange={(e) => setEstado(e.target.value)}: Le decimos: "En cuanto el usuario pulse una tecla, actualiza mi estado inmediatamente".
 
-        **NOTA MUY IMPORTANTE** ¿Por qué? 
-        Si solo pones el input, React no sabe qué hay dentro. Al "controlarlo", React sabe en todo milisegundo qué ha escrito el usuario. Esto permite, por ejemplo, impedir que alguien escriba números en el nombre o letras en el precio en tiempo real (sería un desaste para el negocio)
+## 5. Validación en dos niveles
 
-3. Creamos el Selector de Categorías. El (select)
-Creamos un desplegable con las opciones que definimos en tu tipo Categoria.
-        
-        **NOTA** ¿Por qué?
-        Queremos que el usuario elija una categoría válida (Fantasía, Bustos, etc.) y no que escriba cualquier cosa. Usar un select asegura que los datos sean consistentes con el resto de tu galería.
+1. **Cliente (en `construirItem`)**: longitud mínima del título, precio > 0,
+   fecha válida, etc. Mensajes inmediatos sin red.
+2. **Servidor (en `validarMiniatura`)**: misma validación pero en el
+   backend. Es la "segunda línea de defensa": si alguien hace POST desde
+   `curl` saltándose el formulario, el servidor sigue validando.
 
-4. Creamos el envío. El (handleSubmit)
-Creamos una función que se dispara cuando el usuario hace clic en el botón "Forjar". Usamos e.preventDefault().
-        
-        **NOTA** ¿Por qué?
-        Por defecto, los formularios de toda la vida intentan recargar la página al enviarse. En React (SPA), no queremos que la página se recargue, queremos capturar los datos y decidir nosotros qué hacer con ellos (como guardarlos o mostrar un mensaje).
+Si la validación servidor falla, el frontend muestra el `err.message` real
+(gracias a `ApiError`).
 
 
-## 2. Typescript. // Segunda versión con cada sección explicado
-Despues de definir los Estados (useState), de no olvidar los imports iniciales y actualizar el validador (const handleSubmit)
+## 6. UX de éxito: redirección automática
 
-1. Creamos el contenedor principal. El (div exterior)
-// Aquí se crea la "caja" o tarjeta donde vive el formulario.
+Antes el formulario mostraba un toast verde y limpiaba los campos. Ahora,
+tras crear con éxito:
 
-TypeScript
-        <div className="max-w-2xl mx-auto bg-slate-800 p-8 rounded-xl border border-slate-700 shadow-2xl">
+```ts
+const creada = await miniatureService.create(item);
+navigate(`/producto/${creada.id}`);
+```
 
-- Resumen de clases Tailwind:
-    1. max-w-2xl mx-auto: Centra la caja y le da un ancho máximo cómodo para leer (ni muy ancha ni muy estrecha).
-    2. bg-slate-800: Le da ese color gris muy oscuro/azulado tipo metal.
-    3. p-8: Añade relleno interno para que el contenido no toque los bordes.
-    4. rounded-xl: Redondea las esquinas para un look moderno.
-    5. border border-slate-700: Añade un borde sutil para que resalte sobre el fondo de la web.
-    6. shadow-2xl: Le da una sombra profunda para que parezca que la tarjeta "flota" sobre la mesa de trabajo.
+Esto da dos beneficios:
+1. El usuario ve la pieza recién creada con todos sus datos.
+2. Se confirma que la pieza realmente existe en el backend (no como
+   antes, que mostraba el OK aunque la persistencia hubiese fallado).
 
-2. La cabecera flexible (div interior)
-TypeScript
-        <div className="flex justify-between items-center mb-8">
 
-    Resumen: Es una fila que organiza el título y el botón de volver. El flex y justify-between empujan el título a la izquierda y el enlace de "Volver" a la derecha, dejando espacio entre ellos. El mb-8 es el margen inferior para separarlo de los inputs.
+## 7. Accesibilidad
 
-3. El Título Estilizado (h2)
-Creamos El nombre de la página.
-TypeScript
-        <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
-        Registrar <span className="text-orange-500">Nueva Pieza</span>
-        </h2>
-
-    Resumen: Usamos font-black (letra muy gorda) y tracking-tighter (letras muy juntas) para darle un estilo agresivo y potente. El span con text-orange-500 hace que la palabra "Pieza" resalte con tu color corporativo naranja.
-
-4. El Enlace Inteligente (Link)
-Esto es la puerta de salida para volver a la Home.
-
-TypeScript
-        <Link to="/" className="text-slate-500 hover:text-orange-500 text-sm font-bold transition-colors">
-        ← Volver a la Galería
-        </Link>
-
-    Por qué es especial: Usamos <Link> de React Router en lugar de un <a>.
-
-    Resumen: Esto permite que al pulsar "Volver", la web cambie de página al instante, sin que el navegador tenga que recargar o parpadear. El hover:text-orange-500 hace que el texto se ilumine en naranja cuando pasas el ratón por encima, indicando que es clicable.
-
-### En pocas palabras:
-Este bloque de código es el encabezado de tu tarjeta de formulario con estilos TAILWIND.
-
-Y asegura que el usuario sepa dónde está ("Registrar Nueva Pieza") y tenga una forma rápida y elegante de volver atrás si se arrepiente de algún paso o encargo realizado.
-
-
-## 3. Validamos con una prueba para entender el "Componente Controlado"
-Para que ver "la magia" del *onChange* y el estado, vamos a añadir un "espía" temporal en tu código.
-
-    1. En tu archivo NuevoProducto.tsx, añadimos un console.log, justo antes del return
-    Typescript
-    // ESTO ES EL ESPÍA:
-    console.log("El estado actual del nombre es:", nombre);
-
-    2. Subimos el cambio a github, y vemos la web en vercel. 
-    En la direción de navegación escribimos /nuevo:
-            // *https://taskflow-fullstack-psi.vercel.app/nuevo*
-
-    3. Pulsamos F12 (o Clic derecho > Inspeccionar) y vamos a la pestaña Console.
-
-    4. En la pagina web, en el campo de nombre, empezamos a escrir la palabra "Dragón"
-
-    ¿Qué verás?
-        Escribes D -> La consola dice: El estado actual del nombre es: D
-        Escribes r -> La consola dice: El estado actual del nombre es: Dr
-        Escribes a -> La consola dice: El estado actual del nombre es: Dra
-
-    Al escribir la palabra Dragón salio una "cascada" de mensajes.
-
-    Esa cascada de mensajes en la consola es la prueba irrefutable de que has dominado el Componente Controlado.
-
-### Resumen de la prueba
-¿Qué está pasando exactamente detrás de las cámaras?
-Cada vez que pulsas una tecla para escribir "Dragón", ocurre este ciclo infinito a la velocidad del rayo:
-
-        1. Evento: Pulsas la 'D'. El navegador lanza un evento onChange.
-        2. Captura: Tu código captura esa 'D' con e.target.value.
-        3. Actualización: Llamas a setNombre('D').
-        4. Sincronización: React recibe el nuevo valor, guarda 'D' en su memoria (el Estado) y vuelve a dibujar el componente.
-        5. Reflejo: El input ahora muestra 'D' porque su value está amarrado al estado.
-
-¿Por qué esto es mejor que el método antiguo?
-En el desarrollo web antiguo, el programador tenía que ir al HTML y "preguntar": ¿Oye, qué hay escrito en esta caja?. Con React, tú no preguntas, tú ya lo sabes, porque la información vive en tu código, no solo en la pantalla.
-
-
-## 4. Muestrar mensajes de error y confirmación
-Ahora mismo el NuevoProducto.tsx guarda los datos, pero si el usuario comete un error, no se entera de nada. Vamos a darle "voz" al formulario.
-
-1. Añade los estados de interacción
-Debajo de los estados actuales, añadimos estos dos:
-    Typescript
-    const [descripcion, setDescripcion] = useState('');  //(ya está)
-
-    // NUEVOS ESTADOS
-    const [error, setError] = useState(''); 
-    const [enviado, setEnviado] = useState(false);
-
-2. Implementamos la Validación (Lógica del Paso 10)
-Vamos a modificar la función "handleSubmit". 
-El objetivo es que, si algo está mal, frenemos el envío y avisemos al usuario.
-
-Sustituimos handleSubmit por:
-    Typescript:
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        
-        // Resetear estados
-        setError('');
-        setEnviado(false);
-
-        // VALIDACIÓN BÁSICA
-        if (nombre.trim().length < 3) {
-        setError('El nombre debe tener al menos 3 caracteres.');
-        return; // Cortamos aquí, no sigue ejecutando
-        }
-
-        if (Number(precio) <= 0) {
-        setError('¿Un Dragón gratis? El precio debe ser mayor a 0.');
-        return;
-        }
-
-        // SI TODO ESTÁ BIEN:
-        console.log("Datos validados:", { nombre, precio, categoria, descripcion });
-        setEnviado(true);
-        
-        // Limpiar formulario tras el éxito
-        setNombre('');
-        setPrecio('');
-        setCategoria('');
-        setDescripcion('');
-    };
-
-3. Muestramos los mensajes en la Interfaz
-Para que el usuario vea qué está pasando, añadimos:
-    Typescript:
-    {/* MENSAJE DE ERROR */}
-        {error && (
-            < div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded-lg text-sm font-bold animate-pulse">
-                ⚠️ {error}
-            </div>
-        )}
-
-    {/* MENSAJE DE ÉXITO */}
-        {enviado && (
-            <div className="bg-green-500/10 border border-green-500 text-green-500 p-3 rounded-lg text-sm font-bold">
-            ✅ ¡Unidad forjada y añadida al inventario!
-        </div>
-    )}
-
-### Resumen: ¿Por qué hacemos esto? 
-En React, la interacción no es solo guardar datos, es comunicarse con el usuario:
-
-    Estado de Error: Evita que entren datos basura en tu base de datos (como precios negativos). * Estado de Éxito: Da tranquilidad al usuario confirmando que su acción funcionó.
-
-    Limpieza de Estado: Al hacer setNombre('') tras el éxito, dejas el formulario listo para la siguiente pieza sin que el usuario tenga que borrar a mano
-
-
-- Características Técnicas
-    
-    Estado Centralizado: Se utiliza el hook useState para sincronizar los inputs de texto, numéricos y selectores con el estado de React.
-
-    Validación Preventiva: El sistema impide el envío de datos si no cumplen los requisitos mínimos:
-            Nombre: Mínimo 3 caracteres.
-
-            Precio: Debe ser estrictamente superior a 0.
-
-    Interfaz de Respuesta: Implementación de mensajes condicionales para errores de validación y confirmación de éxito tras el envío.
-
-- Ejemplo de Flujo de Validación
-    
-    Pequeña validación de funcionamiento
-    Prubamos esto, en la web:
-    1. Intentamos enviar el formulario con el precio en 0.
-    2. ¿Te sale el mensaje rojo? ("⚠️ ¿Un Dragón gratis? El precio debe ser mayor a 0")
-    3. Sí, salta el mensaje, TODO OK.  Pasamos al paso 11
-
-- FEAT técnico:
-    El usuario intenta registrar un producto con precio 0.
-    La función handleSubmit intercepta el evento y cancela la recarga de página (e.preventDefault()).
-    Se activa el estado de error, mostrando dinámicamente el aviso en pantalla.
+- Todos los inputs tienen `<label>` asociado (mejora screen readers).
+- El botón submit tiene `disabled={enviando}` y cambia el texto a
+  "Forjando..." durante el await. Evita doble-submit.
+- Uso `noValidate` en el `<form>` porque mi validación es manual y más
+  explícita que la del navegador.

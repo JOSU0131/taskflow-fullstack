@@ -1,11 +1,15 @@
+// src/types/miniatures.ts
+// Modelo de datos del marketplace.
+// HammerItem es una UNIÓN DISCRIMINADA: el campo `tipo` permite a TS
+// inferir qué propiedades extra tiene cada variante.
 
-export type Categoria = 
-  | 'Fantasía' 
-  | 'Bustos' 
-  | 'WIPS' 
-  | 'Monstruos' 
-  | 'Tutorial Pintado'  // Nueva
-  | 'Tutorial Esculpido' // Nueva
+export type Categoria =
+  | 'Fantasía'
+  | 'Bustos'
+  | 'WIPS'
+  | 'Monstruos'
+  | 'Tutorial Pintado'
+  | 'Tutorial Esculpido'
   | 'Otros';
 
 interface BaseItem {
@@ -32,9 +36,22 @@ export interface ItemMecenazgo extends BaseItem {
 export interface ItemTutorial extends BaseItem {
   tipo: 'TUTORIAL';
   precio: number;
-  duracion: string; // Ej: "45 min"
-  nivel: 'Básico' | 'Intermedio'| 'Avanzado';
+  duracion: string;
+  nivel: 'Básico' | 'Intermedio' | 'Avanzado';
 }
 
-// La Unión Discriminada que hace magia
-export type HammerItem = ItemVenta | ItemMecenazgo| ItemTutorial;
+// La unión discriminada que hace magia
+export type HammerItem = ItemVenta | ItemMecenazgo | ItemTutorial;
+
+/**
+ * Helper DISTRIBUTIVO. Aplica Omit a cada miembro de la unión por separado.
+ *
+ * ¿Por qué? `Omit<HammerItem, 'id'>` colapsa la unión y pierde la
+ * relación entre `tipo` y los campos específicos. Con esta versión,
+ * TS sigue sabiendo que si tipo='VENTA' debe haber precio y stock.
+ */
+export type HammerItemSinId = HammerItem extends infer T
+  ? T extends HammerItem
+    ? Omit<T, 'id'>
+    : never
+  : never;
