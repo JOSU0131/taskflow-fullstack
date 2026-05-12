@@ -22,7 +22,7 @@ Segundo Error. Desincronización de Nombres en el Servicio (API)
     Solución: Sincronización de la capa de servicio con el Hook, ajustando los nombres de los métodos para que coincidan con la interfaz definida en el cliente de la API.
 
 
-Tercer Gestión de Estados de Red
+Tercero. Gestión de Estados de Red
     Problema: La aplicación no informaba al usuario si el servidor estaba apagado, quedándose en un estado de carga infinito o mostrando una pantalla vacía.  
 
     Solución: Implementación de un bloque try/catch/finally en el Hook useProductos. Ahora la UI reacciona a tres estados: Carga (spinner), Éxito (renderizado de productos) y Error (mensaje visual de alerta con opción de reintento).

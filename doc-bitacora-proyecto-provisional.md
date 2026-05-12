@@ -178,7 +178,7 @@ Modificando "App.tsx" ir docs/hooks.md
 # Paso 8: Context y estado global
 Ir a docs/context.md
 
-# Paso 8.2: Recordatior despliegue Vercel
+## Paso 8.2: Recordatoeio despliegue Vercel
 
 1. Instalación de Vercel CLI
 Abre la terminal integrada en VS Code (puedes usar Ctrl + Ñ) y escribe:
@@ -266,7 +266,7 @@ En nuestro lab/proyecto **HammerFlow Forge**, esto consistirá en:
     2. Un formulario de contacto o reserva para los artistas.
     3. Validación y Control
 
-# Paso Extra. Estética 
+# Paso Extra. Fallo en Estética 
 Dado que el proyecto había heredado una estética "plana" al clonar/hacer pull del proyecto anterior en github. Ese proyecto habia sido inicializado usando el comando de **Vite** para crear un entorno de React con TypeScript.
 
 
@@ -343,3 +343,10 @@ Estado Final: Una vez unificado el lenguaje (todo a titulo) y limpiado los archi
     Fallo de Conexión (CORS/URL): La aplicación frontend en producción intenta consumir una API en localhost:4000. Se identifica que es necesario configurar una variable de entorno (VITE_API_URL) para que en producción apunte al servidor desplegado y no al local.
 
     Sincronización de Repositorio: Se confirma que GitHub y Vercel están sincronizados (35 commits en total). Los cambios en la carpeta client se despliegan de forma independiente a la carpeta server.
+
+
+
+# Paso 15: Rediseño visual en rama separada".
+
+Paso extra. Mejora UI/UX y Refactorización con IA Claude
+
