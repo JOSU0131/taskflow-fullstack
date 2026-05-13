@@ -6,13 +6,16 @@ import { Link } from 'react-router-dom';
 
 export const Hero = () => (
   <section
-    className="relative overflow-hidden rounded-3xl border border-slate-800
-      bg-gradient-to-br from-slate-900 via-slate-900 to-orange-950/40
-      p-10 md:p-16 mb-12"
+    className="relative overflow-hidden rounded-3xl border border-slate-800 mb-12 min-h-[550px] flex items-center"
+    style={{ 
+      backgroundImage: "url('/hero-hammerflow.jpg')", 
+      backgroundSize: 'cover', 
+      backgroundPosition: 'center' 
+    }}
   >
-    {/* "Glow" decorativo difuminado */}
-    <div className="pointer-events-none absolute -top-32 -right-32 h-96 w-96 rounded-full bg-orange-500/20 blur-3xl" />
-    <div className="pointer-events-none absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-purple-500/10 blur-3xl" />
+
+    {/* "Glow" decorativo difuminado / eliminados/ */}
+    <div className="absolute inset-0 bg-black/25" />
 
     <div className="relative max-w-2xl">
       <span className="inline-block text-xs font-bold uppercase tracking-[0.3em] text-orange-500 mb-4">

@@ -9,16 +9,16 @@ resolví y los tests automáticos que añadí como bonus.
 
 | Caso | Endpoint | Esperado | Resultado |
 |------|----------|----------|-----------|
-| Listar todo | GET /api/miniatures | 200 + array | ✅ |
-| Detalle existente | GET /api/miniatures/2 | 200 + objeto | ✅ |
+| Listar todo         | GET /api/miniatures | 200 + array | ✅ |
+| Detalle existente   | GET /api/miniatures/2 | 200 + objeto | ✅ |
 | Detalle inexistente | GET /api/miniatures/999 | 404 + message | ✅ |
-| Crear sin título | POST `{tipo:"VENTA"}` | 400 + message | ✅ |
-| Crear VENTA válida | POST con todos los campos | 201 + objeto | ✅ |
-| Crear MECENAZGO | POST con meta, recaudado, fechaFin | 201 | ✅ |
-| Crear TUTORIAL | POST con duracion, nivel, precio | 201 | ✅ |
-| Editar | PUT /api/miniatures/1 con `{precio:60}` | 200 | ✅ |
-| Borrar | DELETE /api/miniatures/1 | 200 | ✅ |
-| Borrar inexistente | DELETE /api/miniatures/999 | 404 | ✅ |
+| Crear sin título    | POST `{tipo:"VENTA"}` | 400 + message | ✅ |
+| Crear VENTA válida  | POST con todos los campos | 201 + objeto | ✅ |
+| Crear MECENAZGO     | POST con meta, recaudado, fechaFin | 201 | ✅ |
+| Crear TUTORIAL      | POST con duracion, nivel, precio | 201 | ✅ |
+| Editar              | PUT /api/miniatures/1 con `{precio:60}` | 200 | ✅ |
+| Borrar              | DELETE /api/miniatures/1 | 200 | ✅ |
+| Borrar inexistente  | DELETE /api/miniatures/999 | 404 | ✅ |
 
 NOTA: la prueba "Crear sin título" antes (con el bug) devolvía 400 con el mensaje
 "Nombre y precio son obligatorios". Ahora devuelve "El título es obligatorio
@@ -210,6 +210,5 @@ Test Files  3 passed
 
 - Tests de `useProductos` (necesita mockear `fetch` con MSW o equivalente).
 - Test de DetalleProducto con un id que devuelva 404.
-- Drag & Drop para reordenar favoritos (estuvo en mi lista del bonus pero
-  decidí no hacerlo; me parecía sobre-ingeniería para esta versión).
+- Drag & Drop para reordenar favoritos (en pendiente).
 - Tests E2E con Playwright (sería un paso siguiente real).

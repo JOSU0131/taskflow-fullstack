@@ -674,7 +674,16 @@ Fui a /docs/retrospective.md y lo amplié. Cubre:
     - Cómo usé IA durante el desarrollo (puntos donde ayudó, cuándo me equivoqué siguiéndola, qué aprendí del proceso)
     - Qué me llevo para el próximo proyecto
 
+# Paso 16. Mejora Estetica - Manual
 
+- 1. Qué hemos hecho?: 
+    Borramos el degradado (bg-gradient...), añadimos el style para cargar la imagen y le dimos más altura (min-h-[550px]) para que se vea el paisaje.
+
+    En codigo: quitamos //className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient...//.
+    E introducimos fondo de pantalla paisaje "hero-hammerflow.jpg"
+
+- 2. ¿Qué hemos hecho?: 
+    Quitamos las luces de colores y ponemos una capa negra suave encima de toda la imagen para que las letras blancas se lean bien sobre el cielo naranja.
 
 # Resumen final del estado
 
