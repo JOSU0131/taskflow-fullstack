@@ -1,3 +1,44 @@
 @import "tailwindcss";
 
 /* Si necesitas fuentes personalizadas o variables, van aquí debajo */
+
+/* --- CONFIGURACIÓN MODO CLARO/OSCURO --- */
+
+/* Por defecto (Modo Oscuro) el fondo es oscuro */
+:root {
+  background-color: #020617; /* slate-950 */
+  color: #f8fafc; /* slate-50 */
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* Cuando se activa la clase .light-mode en el HTML */
+.light-mode {
+  background-color: #f8fafc; /* Fondo claro tipo Highlands */
+  color: #0f172a; /* Texto oscuro */
+}
+
+/* Ajustes para el Navbar en modo claro */
+.light-mode header {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  backdrop-blur: 12px;
+  border-bottom-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Forzar que los textos del Navbar sean oscuros en modo claro */
+.light-mode header span.text-white,
+.light-mode header a,
+.light-mode header nav a {
+  color: #0f172a !important;
+}
+
+/* El Hero SIEMPRE se queda oscuro para mantener la épica */
+.light-mode section {
+  color: white !important;
+}
+
+/* Ajuste de las tarjetas de la galería en modo claro */
+.light-mode .bg-slate-900 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}

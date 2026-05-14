@@ -682,7 +682,6 @@ Fui a /docs/retrospective.md y lo amplié. Cubre:
     En codigo: quitamos //className="relative overflow-hidden rounded-3xl border border-slate-800 bg-gradient...//.
     E introducimos fondo de pantalla paisaje "hero-hammerflow.jpg"
 
-- 2. ¿Qué hemos hecho?: 
     Quitamos las luces de colores y ponemos una capa negra suave encima de toda la imagen para que las letras blancas se lean bien sobre el cielo naranja.
 
 - 3. ¿Qué hemos hecho?:
@@ -697,7 +696,7 @@ Fui a /docs/retrospective.md y lo amplié. Cubre:
 
     - Evolución de Home: Pasamos de una web que era "solo una galería" (estilo Second Hammer) a una Home estructurada que presenta el ecosistema completo: piezas únicas, mecenazgos y formación.
 
-Añadimos (versión 3):
+- 4. Añadimos (versión 3):
 
     ¿Qué hemos hecho?:
 
@@ -709,7 +708,15 @@ Añadimos (versión 3):
 
     - Composición de Landing: Se reorganizaron los elementos (título, descripción y botones) para estar completamente centrados, mejorando la jerarquía visual de la página de inicio.
 
+    - Boton "oscuro"
+        ¿Qué hemos hecho? (Resumen para la Bitácora)
+        Inyección de Estilos Globales: Se ha utilizado el archivo index.css como núcleo para gestionar la transición de colores entre temas, aprovechando la cascada de CSS.
 
+        Normalización de Colores: Se definieron variables de color para que, al activar la clase .light-mode, los componentes de la interfaz (Navbar, Tarjetas, Texto) reaccionen automáticamente al cambio.
+
+        Preservación de Estética Hero: Se establecieron reglas de exclusión para asegurar que la sección de bienvenida (Hero) mantenga su contraste oscuro y épico, independientemente del modo seleccionado por el usuario.
+
+        Suavizado de Transición: Se añadió una propiedad transition en el :root para que el cambio de Sol a Luna no sea un "golpe" visual, sino un desvanecimiento suave de medio segundo.
 
 # Resumen final del estado
 

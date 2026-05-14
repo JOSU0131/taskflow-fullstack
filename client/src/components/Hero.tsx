@@ -9,7 +9,7 @@ export const Hero = () => (
     // usamos "w-full min-h-[90vh]" para que cubra toda la pantalla y se adapte a diferentes tamaños.//
     className="relative w-full min-h-[85vh] flex items-center justify-center overflow-hidden"
     style={{
-      backgroundImage: "url('/hero-highlands.jpg')",
+      backgroundImage: "url('/hero-hammerflow.jpg')",
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     }}
