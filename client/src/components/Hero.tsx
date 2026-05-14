@@ -6,43 +6,43 @@ import { Link } from 'react-router-dom';
 
 export const Hero = () => (
   <section
-    className="relative overflow-hidden rounded-3xl border border-slate-800 mb-12 min-h-[550px] flex items-center"
+    className="relative overflow-hidden w-full min-h-[85vh] flex items-center justify-center"
     style={{ 
-      backgroundImage: "url('/hero-hammerflow.jpg')", 
+      backgroundImage: "url('/hero-highlands.jpg')", 
       backgroundSize: 'cover', 
       backgroundPosition: 'center' 
     }}
   >
 
-    {/* "Glow" decorativo difuminado / eliminados/ */}
-    <div className="absolute inset-0 bg-black/25" />
+    {/* 2. Velo de oscuridad para legibilidad */}
+    <div className="absolute inset-0 bg-black/40" />
 
-    <div className="relative max-w-2xl">
-      <span className="inline-block text-xs font-bold uppercase tracking-[0.3em] text-orange-500 mb-4">
-        El mercado del hobby
-      </span>
-      <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-white leading-[0.95]">
-        Compra, financia y <span className="text-orange-500 italic">aprende</span> el arte de las miniaturas.
+    {/* 3. Contenido centrado y más grande */}
+    <div className="relative z-10 p-6 md:p-20 max-w-5xl text-center">
+      <h1 className="text-6xl md:text-9xl font-black tracking-tighter mb-4 uppercase italic"
+          style={{
+            color: '#ffcc00', 
+            textShadow: '4px 4px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0px 10px 20px rgba(0,0,0,0.8)',
+            lineHeight: '0.85'
+          }}>
+        Hammerflow <br/> Forge
+      </h1>
+
+      <h2 className="text-2xl md:text-4xl font-bold text-white tracking-tight mt-6">
+        Compra, financia y <span className="text-[#ffcc00]">aprende</span> el arte de las miniaturas.
       </h2>
-      <p className="mt-5 text-slate-400 text-base md:text-lg max-w-xl">
-        Una sola plataforma para piezas únicas, mecenazgos de artistas
-        emergentes y videotutoriales premium. Sin algoritmos raros.
-      </p>
-
-      <div className="mt-8 flex flex-wrap gap-3">
+      
+      {/* 4. Botones centrados */}
+      <div className="mt-12 flex flex-wrap justify-center gap-6">
         <Link
           to="/nuevo"
-          className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-6 py-3
-            rounded-lg font-bold text-sm uppercase tracking-widest
-            transition-all hover:scale-[1.03] active:scale-95 shadow-lg shadow-orange-500/30"
+          className="bg-[#ff6600] hover:bg-[#ff8800] text-white px-10 py-5 rounded-sm font-bold text-sm uppercase tracking-[0.2em] transition-all hover:scale-105 shadow-2xl shadow-black"
         >
           Forjar nueva pieza
-          <span aria-hidden>→</span>
         </Link>
         <a
           href="#galeria"
-          className="inline-flex items-center gap-2 border border-slate-700 hover:border-orange-500 text-slate-200
-            px-6 py-3 rounded-lg font-bold text-sm uppercase tracking-widest transition-colors"
+          className="backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-sm font-bold text-sm uppercase tracking-[0.2em] transition-colors"
         >
           Ver galería
         </a>
@@ -50,3 +50,5 @@ export const Hero = () => (
     </div>
   </section>
 );
+
+    

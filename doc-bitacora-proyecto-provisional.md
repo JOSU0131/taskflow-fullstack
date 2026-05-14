@@ -685,6 +685,19 @@ Fui a /docs/retrospective.md y lo amplié. Cubre:
 - 2. ¿Qué hemos hecho?: 
     Quitamos las luces de colores y ponemos una capa negra suave encima de toda la imagen para que las letras blancas se lean bien sobre el cielo naranja.
 
+- 3. ¿Qué hemos hecho?:
+
+    - Inmersión Total: Eliminamos los bordes y redondeados del Hero.tsx para que la imagen épica ocupe todo el ancho y casi todo el alto de la pantalla (min-h-[85vh]), creando una verdadera "carta de presentación".
+
+    - Identidad de Marca: Implementamos el título "Hammerflow Forge" con estilo wargame interactivo (amarillo con perfilado negro) que se queda en la cabecera de la experiencia visual.
+
+    - Transición de Estilo: Preparamos la estructura para que el "fondo épico" sea solo el inicio, permitiendo que al hacer scroll la web pase a secciones de contenido (Galería, Tutoriales, etc.) sobre fondos más limpios o neutros.
+
+    - Header "Flotante": Ajustamos la lógica para que el menú de navegación sea independiente del fondo del Hero, permitiendo que pueda quedarse fijo en la parte superior (sticky) mientras el usuario navega.
+
+    - Evolución de Home: Pasamos de una web que era "solo una galería" (estilo Second Hammer) a una Home estructurada que presenta el ecosistema completo: piezas únicas, mecenazgos y formación.
+
+
 # Resumen final del estado
 
 Estructura final del cliente:
