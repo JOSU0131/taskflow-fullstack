@@ -697,6 +697,19 @@ Fui a /docs/retrospective.md y lo amplié. Cubre:
 
     - Evolución de Home: Pasamos de una web que era "solo una galería" (estilo Second Hammer) a una Home estructurada que presenta el ecosistema completo: piezas únicas, mecenazgos y formación.
 
+Añadimos (versión 3):
+
+    ¿Qué hemos hecho?:
+
+    - Rediseño de Navegación: Se transformó el Header en un elemento flotante y centrado (estilo Highlands), eliminando la alineación lateral anterior.
+
+    - Expansión Visual: Se liberó el componente Hero de sus márgenes y bordes redondeados, logrando que la imagen de fondo cubra el 100% del ancho de la pantalla.
+
+    - Restauración de Identidad: Se recuperó el estilo de logo "Games Workshop" con texto amarillo perfilado en negro y sombras profundas para el título principal.
+
+    - Composición de Landing: Se reorganizaron los elementos (título, descripción y botones) para estar completamente centrados, mejorando la jerarquía visual de la página de inicio.
+
+
 
 # Resumen final del estado
 

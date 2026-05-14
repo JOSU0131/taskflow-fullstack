@@ -5,52 +5,45 @@
 import { Link, NavLink } from 'react-router-dom';
 import { useFavoritosContext } from '../hooks/useFavoritosContext';
 
-const linkBase = 'text-sm font-bold uppercase tracking-widest transition-colors';
-const linkInactivo = 'text-slate-400 hover:text-white';
-const linkActivo = 'text-orange-500';
+const linkBase = 'text-xs font-bold uppercase tracking-[0.2em] transition-all duration-300';
+const linkInactivo = 'text-slate-400 hover:text-white hover:scale-105';
+const linkActivo = 'text-[#ffcc00] border-b border-[#ffcc00] pb-1';
 
 export const Navbar = () => {
   const { favoritos } = useFavoritosContext();
 
   return (
-    <header className="mb-8 sticky top-0 z-30 backdrop-blur-md bg-slate-950/70 border-b border-slate-800">
-      <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
-        <Link to="/" className="flex items-baseline gap-1">
-          <span className="text-2xl md:text-3xl font-black tracking-tighter text-white italic">
-            HAMMER<span className="text-orange-500">FLOW</span>
+    // "sticky top-0" para que flote al bajar. 
+    // "bg-black/20" y "backdrop-blur" para el efecto cristal de Highlands
+    <header className="sticky top-0 z-50 w-full bg-black/20 backdrop-blur-md border-b border-white/5 transition-all duration-500">
+      <div className="container mx-auto px-6 py-6 flex flex-col items-center gap-6">
+        
+        {/* LOGO CENTRADO: Sin todo mayúsculas y con color de marca */}
+        <Link to="/" className="group flex flex-col items-center">
+          <span className="text-3xl md:text-4xl font-black tracking-tighter text-white italic leading-none transition-transform group-hover:scale-105">
+            HammerFlow <span className="text-[#ffcc00]">Forge</span>
           </span>
-          <span className="hidden sm:inline text-xs font-bold uppercase tracking-widest text-slate-500">
-            Forge
+          <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-500 mt-1 group-hover:text-orange-500 transition-colors">
+            Digital Sculpture Studio
           </span>
         </Link>
 
-        <nav className="flex items-center gap-5">
-          <NavLink
-            to="/"
-            end
-            className={({ isActive }) => `${linkBase} ${isActive ? linkActivo : linkInactivo}`}
-          >
+        {/* NAVEGACIÓN CENTRADA: Debajo del logo como en Highlands */}
+        <nav className="flex items-center gap-10">
+          <NavLink to="/" end className={({ isActive }) => `${linkBase} ${isActive ? linkActivo : linkInactivo}`}>
             Galería
           </NavLink>
-          <NavLink
-            to="/favoritos"
-            className={({ isActive }) => `${linkBase} ${isActive ? linkActivo : linkInactivo} relative`}
-          >
+          
+          <NavLink to="/favoritos" className={({ isActive }) => `${linkBase} ${isActive ? linkActivo : linkInactivo} relative`}>
             Favoritos
             {favoritos.length > 0 && (
-              <span
-                className="absolute -top-2 -right-4 min-w-[18px] h-[18px] px-1
-                  bg-orange-500 text-white text-[10px] font-black
-                  rounded-full flex items-center justify-center"
-              >
+              <span className="absolute -top-3 -right-5 min-w-4 h-4 bg-[#ffcc00] text-black text-[9px] font-black rounded-full flex items-center justify-center animate-pulse">
                 {favoritos.length}
               </span>
             )}
           </NavLink>
-          <NavLink
-            to="/nuevo"
-            className={({ isActive }) => `${linkBase} ${isActive ? linkActivo : linkInactivo} hidden md:inline`}
-          >
+
+          <NavLink to="/nuevo" className={({ isActive }) => `${linkBase} ${isActive ? linkActivo : linkInactivo}`}>
             Forjar
           </NavLink>
         </nav>
