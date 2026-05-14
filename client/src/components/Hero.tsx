@@ -8,7 +8,7 @@ export const Hero = () => (
   <section
     className="relative overflow-hidden w-full min-h-[85vh] flex items-center justify-center"
     style={{ 
-      backgroundImage: "url('/hero-highlands.jpg')", 
+      backgroundImage: "url('/hero-hammerflow.jpg')", 
       backgroundSize: 'cover', 
       backgroundPosition: 'center' 
     }}
