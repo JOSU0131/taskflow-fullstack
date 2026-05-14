@@ -29,24 +29,26 @@ function App() {
   return (
     <FavoritosProvider>
       <Router>
-        <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-orange-500/30">
+        <div className="min-h-screen bg-black text-slate-100 selection:bg-[#ffcc00]/30">
           <Navbar />
 
-          <main className="max-w-6xl mx-auto px-6 pb-16">
-            <Suspense fallback={<RouteFallback />}>
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/producto/:id" element={<DetalleProducto />} />
-                <Route path="/nuevo" element={<NuevoProducto />} />
-                <Route path="/favoritos" element={<Favoritos />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </main>
+          {/* HEMOS QUITADO EL <main> DE AQUÍ. 
+              Ahora las rutas están libres.
+          */}
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/producto/:id" element={<DetalleProducto />} />
+              <Route path="/nuevo" element={<NuevoProducto />} />
+              <Route path="/favoritos" element={<Favoritos />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
 
           <footer className="border-t border-slate-800 mt-10">
+            {/* El footer sí puede mantener el max-w-6xl para estar centrado */}
             <div className="max-w-6xl mx-auto px-6 py-8 text-center text-slate-500 text-sm">
-              &copy; {new Date().getFullYear()} HammerFlow Forge — Panel de Control de Artista
+              &copy; {new Date().getFullYear()} HammerFlow Forge
             </div>
           </footer>
         </div>

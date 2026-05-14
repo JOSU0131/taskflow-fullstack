@@ -52,7 +52,7 @@ export const Navbar = () => {
             HammerFlow <span className="text-[#ffcc00]">Forge</span>
           </span>
           <span className="text-[10px] font-bold uppercase tracking-[0.5em] text-slate-500 mt-1 group-hover:text-orange-500 transition-colors">
-            Digital Sculpture Studio
+            El mercado definitivo para artistas
           </span>
         </Link>
 

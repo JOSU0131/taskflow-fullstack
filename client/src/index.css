@@ -6,22 +6,29 @@
 
 /* Por defecto (Modo Oscuro) el fondo es oscuro */
 :root {
-  background-color: #020617; /* slate-950 */
+  background-color: #000000 !important;
   color: #f8fafc; /* slate-50 */
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
+/* Ajuste para que el body también sea negro */
+body {
+  background-color: #000000;
+  margin: 0;
+}
+
 /* Cuando se activa la clase .light-mode en el HTML */
 .light-mode {
-  background-color: #f8fafc; /* Fondo claro tipo Highlands */
+  background-color: #f8fafc !important;
   color: #0f172a; /* Texto oscuro */
 }
 
 /* Ajustes para el Navbar en modo claro */
 .light-mode header {
-  background-color: rgba(255, 255, 255, 0.7) !important;
-  backdrop-blur: 12px;
+  /* Al quitar el blur, quizás quieras que el blanco sea más sólido (0.9 o 1) */
+  background-color: rgba(255, 255, 255, 0.95) !important; 
   border-bottom-color: rgba(0, 0, 0, 0.1) !important;
+  /* El backdrop-blur ha sido eliminado */
 }
 
 /* Forzar que los textos del Navbar sean oscuros en modo claro */
