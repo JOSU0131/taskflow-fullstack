@@ -15,7 +15,6 @@ export default function Galeria() {
     busqueda,
     setBusqueda,
     estaCargando,
-    error,
   } = useProductos();
 
   return (
