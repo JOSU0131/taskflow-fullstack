@@ -59,19 +59,31 @@ export const useProductos = () => {
   // cada re-render que no toque estas tres dependencias.
   const productosFiltrados = useMemo(() => {
     let resultado = productos;
+    // 1. FILTRADO POR CATEGORÍA
+      if (categoriaSeleccionada) {
+        if (categoriaSeleccionada === 'Tutorial') {
+          // Si es Tutorial, busca cualquier cosa que contenga esa palabra
+          resultado = resultado.filter(item => 
+            item.categoria && item.categoria.toLowerCase().includes('tutorial')
+          );
+        } else {
+          // Filtro exacto para Fantasía, Bustos, etc.
+          resultado = resultado.filter(item => item.categoria === categoriaSeleccionada);
+        }
+      } 
+      // Si categoriaSeleccionada es null (botón "Todos"), no entra en el if 
+      // y 'resultado' sigue siendo el array completo de 'productos'.
 
-    if (categoriaSeleccionada) {
-      resultado = resultado.filter(item => item.categoria === categoriaSeleccionada);
-    }
-
-    if (busquedaDebounced.trim()) {
-      const q = busquedaDebounced.trim().toLowerCase();
-      resultado = resultado.filter(
-        item =>
-          item.titulo.toLowerCase().includes(q) ||
-          item.autor.toLowerCase().includes(q)
-      );
-    }
+      // 2. FILTRADO POR BÚSQUEDA (Buscador)
+      if (busquedaDebounced.trim()) {
+        const q = busquedaDebounced.trim().toLowerCase();
+        resultado = resultado.filter(
+          item =>
+            item.titulo.toLowerCase().includes(q) ||
+            item.autor.toLowerCase().includes(q)
+        );
+      }
+    
 
     return resultado;
   }, [productos, categoriaSeleccionada, busquedaDebounced]);

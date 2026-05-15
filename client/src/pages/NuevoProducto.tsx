@@ -19,7 +19,7 @@ const CATEGORIAS: Categoria[] = [
   'Bustos',
   'WIPS',
   'Monstruos',
-  'Tutorial Pintado',
+  'Tutorial',
   'Tutorial Esculpido',
   'Otros',
 ];
@@ -130,7 +130,6 @@ export default function NuevoProducto() {
     try {
       setEnviando(true);
       const creada = await miniatureService.create(item);
-      // Vamos directos a la pieza creada (mejor UX que un mensaje y limpiar)
       navigate(`/producto/${creada.id}`);
     } catch (err) {
       if (err instanceof ApiError) {
@@ -143,45 +142,49 @@ export default function NuevoProducto() {
     }
   };
 
-  // Estilos compartidos
+  // ESTILOS ESTÉTICOS (Bordes más grandes y estética oscura de la forja)
   const inputClass =
-    'w-full bg-slate-900 border border-slate-700 rounded-lg py-3 px-4 text-white ' +
-    'focus:border-orange-500 outline-none transition-all';
+    'w-full bg-black border-2 border-white/10 rounded-sm py-3 px-4 text-white ' +
+    'focus:border-[#ff6600] outline-none transition-all font-serif italic';
+  
   const labelClass =
-    'block text-xs font-black text-slate-500 mb-2 uppercase tracking-widest';
+    'block text-xs font-black text-[#ff6600] mb-2 uppercase tracking-[0.2em]';
 
   return (
-    <div className="max-w-2xl mx-auto bg-slate-900 p-6 md:p-8 rounded-xl border border-slate-800 shadow-2xl">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-black text-white uppercase tracking-tighter">
-          Registrar <span className="text-orange-500">Nueva Pieza</span>
-        </h2>
-        <Link to="/" className="text-slate-500 hover:text-orange-500 text-sm font-bold transition-colors">
+    <div className="max-w-2xl mx-auto bg-[#0a0a0a] p-6 md:p-10 rounded-sm border-2 border-white/5 shadow-2xl">
+      <div className="flex justify-between items-center mb-10">
+        <div>
+          <h2 className="text-4xl font-black text-white uppercase tracking-tighter italic">
+            Registrar <span className="text-[#ff6600]">Nueva Pieza</span>
+          </h2>
+          <p className="text-slate-500 text-xs mt-1 font-serif italic">Añade tu obra al catálogo de la forja</p>
+        </div>
+        <Link to="/" className="text-slate-500 hover:text-white text-[10px] font-black uppercase tracking-widest border-b border-white/10 transition-colors">
           ← Volver
         </Link>
       </div>
 
-      {/* Selector de TIPO (3 botones grandes) */}
-      <div className="grid grid-cols-3 gap-2 mb-8">
+      {/* Selector de TIPO (3 botones con estética metálica) */}
+      <div className="grid grid-cols-3 gap-3 mb-10">
         {(['VENTA', 'MECENAZGO', 'TUTORIAL'] as TipoForm[]).map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setTipo(t)}
-            className={`py-3 rounded-lg font-bold text-xs uppercase tracking-widest transition-all
+            className={`py-3 rounded-sm font-black text-[10px] uppercase tracking-tighter transition-all border-2
               ${tipo === t
-                ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
-                : 'bg-slate-800 text-slate-400 hover:bg-slate-700'}`}
+                ? 'bg-[#ff6600] border-[#ff6600] text-white shadow-lg shadow-[#ff6600]/20'
+                : 'bg-black border-white/10 text-slate-500 hover:border-white/20'}`}
           >
             {t}
           </button>
         ))}
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+      <form onSubmit={handleSubmit} className="space-y-8" noValidate>
         {/* Campos comunes */}
         <div>
-          <label className={labelClass}>Título</label>
+          <label className={labelClass}>Título de la obra</label>
           <input
             type="text"
             value={titulo}
@@ -191,15 +194,15 @@ export default function NuevoProducto() {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className={labelClass}>Autor</label>
+            <label className={labelClass}>Autor / Maestro</label>
             <input
               type="text"
               value={autor}
               onChange={(e) => setAutor(e.target.value)}
               className={inputClass}
-              placeholder="Tu nick de artista"
+              placeholder="Tu firma"
             />
           </div>
           <div>
@@ -207,7 +210,7 @@ export default function NuevoProducto() {
             <select
               value={categoria}
               onChange={(e) => setCategoria(e.target.value as Categoria)}
-              className={`${inputClass} appearance-none`}
+              className={`${inputClass} appearance-none cursor-pointer`}
             >
               <option value="">Seleccionar...</option>
               {CATEGORIAS.map((c) => (
@@ -218,7 +221,7 @@ export default function NuevoProducto() {
         </div>
 
         <div>
-          <label className={labelClass}>URL de imagen</label>
+          <label className={labelClass}>URL de imagen (El pergamino visual)</label>
           <input
             type="url"
             value={imagen}
@@ -228,111 +231,104 @@ export default function NuevoProducto() {
           />
         </div>
 
-        {/* Campos específicos por tipo */}
-        {tipo === 'VENTA' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className={labelClass}>Precio (€)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={precio}
-                onChange={(e) => setPrecio(e.target.value)}
-                className={inputClass}
-                placeholder="0.00"
-              />
+        {/* Campos específicos por tipo con divisor sutil */}
+        <div className="pt-6 border-t-2 border-white/5">
+          {tipo === 'VENTA' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className={labelClass}>Precio de Venta (€)</label>
+                <input
+                  type="number"
+                  value={precio}
+                  onChange={(e) => setPrecio(e.target.value)}
+                  className={inputClass}
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Unidades en Stock</label>
+                <input
+                  type="number"
+                  value={stock}
+                  onChange={(e) => setStock(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
             </div>
-            <div>
-              <label className={labelClass}>Stock</label>
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={stock}
-                onChange={(e) => setStock(e.target.value)}
-                className={inputClass}
-              />
-            </div>
-          </div>
-        )}
+          )}
 
-        {tipo === 'MECENAZGO' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className={labelClass}>Meta (€)</label>
-              <input
-                type="number"
-                min="0"
-                value={meta}
-                onChange={(e) => setMeta(e.target.value)}
-                className={inputClass}
-                placeholder="5000"
-              />
+          {tipo === 'MECENAZGO' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className={labelClass}>Meta (€)</label>
+                <input
+                  type="number"
+                  value={meta}
+                  onChange={(e) => setMeta(e.target.value)}
+                  className={inputClass}
+                  placeholder="5000"
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Recaudado (€)</label>
+                <input
+                  type="number"
+                  value={recaudado}
+                  onChange={(e) => setRecaudado(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Fecha Cierre</label>
+                <input
+                  type="date"
+                  value={fechaFin}
+                  onChange={(e) => setFechaFin(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
             </div>
-            <div>
-              <label className={labelClass}>Recaudado (€)</label>
-              <input
-                type="number"
-                min="0"
-                value={recaudado}
-                onChange={(e) => setRecaudado(e.target.value)}
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Fecha fin</label>
-              <input
-                type="date"
-                value={fechaFin}
-                onChange={(e) => setFechaFin(e.target.value)}
-                className={inputClass}
-              />
-            </div>
-          </div>
-        )}
+          )}
 
-        {tipo === 'TUTORIAL' && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className={labelClass}>Precio (€)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={precio}
-                onChange={(e) => setPrecio(e.target.value)}
-                className={inputClass}
-                placeholder="20"
-              />
+          {tipo === 'TUTORIAL' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className={labelClass}>Precio (€)</label>
+                <input
+                  type="number"
+                  value={precio}
+                  onChange={(e) => setPrecio(e.target.value)}
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Duración</label>
+                <input
+                  type="text"
+                  value={duracion}
+                  onChange={(e) => setDuracion(e.target.value)}
+                  className={inputClass}
+                  placeholder="2 horas"
+                />
+              </div>
+              <div>
+                <label className={labelClass}>Nivel de Maestría</label>
+                <select
+                  value={nivel}
+                  onChange={(e) => setNivel(e.target.value as Nivel)}
+                  className={`${inputClass} appearance-none cursor-pointer`}
+                >
+                  <option value="Básico">Básico</option>
+                  <option value="Intermedio">Intermedio</option>
+                  <option value="Avanzado">Avanzado</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label className={labelClass}>Duración</label>
-              <input
-                type="text"
-                value={duracion}
-                onChange={(e) => setDuracion(e.target.value)}
-                className={inputClass}
-                placeholder="2 horas"
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Nivel</label>
-              <select
-                value={nivel}
-                onChange={(e) => setNivel(e.target.value as Nivel)}
-                className={`${inputClass} appearance-none`}
-              >
-                <option value="Básico">Básico</option>
-                <option value="Intermedio">Intermedio</option>
-                <option value="Avanzado">Avanzado</option>
-              </select>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500 text-red-400 p-3 rounded-lg text-sm font-bold">
+          <div className="bg-red-900/10 border-2 border-red-900/50 text-red-500 p-4 rounded-sm text-xs font-black uppercase tracking-widest text-center">
             ⚠️ {error}
           </div>
         )}
@@ -340,11 +336,11 @@ export default function NuevoProducto() {
         <button
           type="submit"
           disabled={enviando}
-          className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed
-            text-white font-black py-4 rounded-lg uppercase tracking-widest transition-all
-            transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-orange-500/20"
+          className="w-full bg-[#ff6600] hover:bg-[#ff8800] disabled:opacity-50
+            text-white font-black py-5 rounded-sm uppercase tracking-[0.3em] transition-all
+            shadow-xl shadow-[#ff6600]/10 active:scale-[0.98]"
         >
-          {enviando ? 'Forjando...' : 'Forjar Producto'}
+          {enviando ? 'Iniciando Forja...' : 'Consagrar en la Forja'}
         </button>
       </form>
     </div>

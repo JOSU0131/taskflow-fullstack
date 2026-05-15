@@ -5,7 +5,7 @@ import { Buscador } from '../components/Buscador';
 import { GridProductos } from '../components/GridProductos';
 import { SkeletonGrid } from '../components/SkeletonCard';
 
-const CATEGORIAS: Categoria[] = ['Fantasía', 'Bustos', 'Monstruos', 'Tutorial Pintado'];
+const CATEGORIAS: Categoria[] = ['Fantasía', 'Bustos', 'Monstruos', 'Tutorial'];
 
 export default function Galeria() {
   const {

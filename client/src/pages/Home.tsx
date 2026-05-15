@@ -9,7 +9,7 @@ import { Buscador } from '../components/Buscador';
 import { GridProductos } from '../components/GridProductos';
 import { SkeletonGrid } from '../components/SkeletonCard';
 
-const CATEGORIAS: Categoria[] = ['Fantasía', 'Bustos', 'Monstruos', 'Tutorial Pintado'];
+const CATEGORIAS: Categoria[] = ['Fantasía', 'Bustos', 'Monstruos', 'Tutorial'];
 
 export default function Home() {
   const {
@@ -26,6 +26,9 @@ export default function Home() {
     <>
       {/* 1. El Hero ocupa el 100% de ancho (liberado en App.tsx) */}
       <Hero />
+
+      {/* LÍNEA DE SEPARACIÓN SUTIL: Atraviesa toda la pantalla */}
+      <div className="border-t border-white/10 w-full" />
 
       {/* 2. Añadimos este div para centrar el resto del contenido */}
       <div className="max-w-6xl mx-auto px-6 py-16">

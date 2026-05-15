@@ -14,25 +14,10 @@ export const Buscador = ({ valor, onCambio, placeholder = 'Buscar por título o 
       value={valor}
       onChange={(e) => onCambio(e.target.value)}
       placeholder={placeholder}
-      className="w-full bg-slate-900 border border-slate-700 hover:border-slate-600 focus:border-orange-500
-        rounded-lg py-3 pl-11 pr-4 text-white placeholder:text-slate-500
-        outline-none transition-all"
+      className="w-full bg-white/5 border border-white/10 text-white placeholder:text-slate-500 
+      px-4 py-3 rounded-sm focus:outline-none focus:border-[#ff6600]/50 focus:ring-1
+       focus:ring-[#ff6600]/50 transition-all"
       aria-label="Buscador de miniaturas"
     />
-    <svg
-      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
   </div>
 );

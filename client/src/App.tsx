@@ -11,6 +11,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { FavoritosProvider } from './context/FavoritosProvider';
 import { Navbar } from './components/Navbar';
+import { Footer } from './components/Footer';
 
 // Lazy pages — cada una en su propio bundle
 const Home = lazy(() => import('./pages/Home'));
@@ -45,12 +46,10 @@ function App() {
             </Routes>
           </Suspense>
 
-          <footer className="border-t border-slate-800 mt-10">
-            {/* El footer sí puede mantener el max-w-6xl para estar centrado */}
-            <div className="max-w-6xl mx-auto px-6 py-8 text-center text-slate-500 text-sm">
-              &copy; {new Date().getFullYear()} HammerFlow Forge
-            </div>
-          </footer>
+          
+          {/* 2. BORRA el footer viejo y pon el nuevo así: */}
+          <Footer />
+        
         </div>
       </Router>
     </FavoritosProvider>

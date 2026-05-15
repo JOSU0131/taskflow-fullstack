@@ -8,7 +8,7 @@ export type Categoria =
   | 'Bustos'
   | 'WIPS'
   | 'Monstruos'
-  | 'Tutorial Pintado'
+  | 'Tutorial'
   | 'Tutorial Esculpido'
   | 'Otros';
 
