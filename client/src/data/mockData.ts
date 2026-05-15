@@ -28,7 +28,7 @@ export const PRODUCTOS_MOCK: HammerItem[] = [
     titulo: 'Tutorial de Pintura Avanzada',
     autor: 'Archaon_Paints',
     imagen: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcScJ-2hyv3q-EsXVqKAfPFTaWqXgrKIvKVh52KvD8jAmOpF7ffaMmlqOuknU6SL',
-    categoria: 'Tutorial Pintado',
+    categoria: 'Tutorial',
     duracion: '2 horas',
     nivel: 'Intermedio',
     precio: 20
