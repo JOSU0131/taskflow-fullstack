@@ -3,8 +3,7 @@
 // HammerItem es una UNIÓN DISCRIMINADA: el campo `tipo` permite a TS
 // inferir qué propiedades extra tiene cada variante.
 
-export type Categoria = 'Fantasía' | 'Bustos' | 'Monstruos' | 'Tutorial Pintado' | 
-'Tutorial Esculpido' | 'Tutorial' | 'WIPS' | 'Otros'; ;
+export type Categoria = 'Fantasía' | 'Bustos' | 'Monstruos' | 'Tutorial';
 
 interface BaseItem {
   id: string;

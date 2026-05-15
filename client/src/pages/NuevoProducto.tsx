@@ -17,11 +17,8 @@ type Nivel = 'Básico' | 'Intermedio' | 'Avanzado';
 const CATEGORIAS: Categoria[] = [
   'Fantasía',
   'Bustos',
-  'WIPS',
   'Monstruos',
   'Tutorial',
-  'Tutorial Esculpido',
-  'Otros',
 ];
 
 export default function NuevoProducto() {
