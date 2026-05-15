@@ -1,67 +1,101 @@
+// src/hooks/useProductos.ts
+// Hook principal que maneja la lista de miniaturas.
+// Responsabilidades:
+//   - Cargar productos desde la API
+//   - Estados de red (cargando / error / datos)
+//   - Filtro por categoría (persistido en localStorage)
+//   - Búsqueda por título/autor (con debounce)
+//
+// NOTA: solo el FILTRO de UI vive en localStorage (preferencia visual del
+// usuario). Los productos en sí son fuente de verdad del backend, como pide
+// el paso 12 del enunciado.
+
 import { useState, useMemo, useEffect } from 'react';
-import { miniatureService } from '../api/miniatureService'; // Importamos el servicio real BORRAMOS EL MOCK
+import { miniatureService } from '../api/miniatureService';
 import type { Categoria, HammerItem } from '../types/miniatures';
+import { useDebounce } from './useDebounce';
 
-// 1. INICIALIZACIÓN CON LOCALSTORAGE
-  // En lugar de empezar en 'null', revisamos si hay algo guardado en el navegador
 export const useProductos = () => {
+  const [productos, setProductos] = useState<HammerItem[]>([]);
 
-const [productos, setProductos] = useState<HammerItem[]>([]); // Ahora empezamos con un array vacío
-const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<Categoria | null>(() => {
+  const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<Categoria | null>(() => {
     const guardado = localStorage.getItem('hammer-categoria');
-    // Si existe, lo devolvemos como el estado inicial; si no, usamos null
     return guardado ? (guardado as Categoria) : null;
   });
 
-const [estaCargando, setEstaCargando] = useState(true);
-const [error, setError] = useState<string | null>(null); // AÑADIMOS Paso 12
+  const [busqueda, setBusqueda] = useState('');
+  const busquedaDebounced = useDebounce(busqueda, 250);
 
-  // 2. PERSISTENCIA AUTOMÁTICA (Nuevo useEffect)
+  const [estaCargando, setEstaCargando] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Persistencia de la categoría seleccionada (preferencia de UI)
   useEffect(() => {
     if (categoriaSeleccionada) {
-      localStorage.setItem('hammer-categoria', categoriaSeleccionada as string);
+      localStorage.setItem('hammer-categoria', categoriaSeleccionada);
     } else {
-      // Si es null (botón "Todos"), limpiamos la entrada para no ocupar espacio
-      localStorage.removeItem('hammer-categoria'); 
-    }  
+      localStorage.removeItem('hammer-categoria');
+    }
   }, [categoriaSeleccionada]);
 
-  // SIMULACIÓN DE CARGA (useEffect)  BORRADO EN PASO 12, YA NO SIMULAMOS CARGA, SINO QUE REALMENTE TRAEMOS LOS DATOS DESDE EL BACKEND
-  // 3. CARGA REAL DE DATOS (Sustituye a tu simulación de 1.2s)
+  // Carga inicial desde la API
   useEffect(() => {
     const obtenerDatos = async () => {
       try {
         setEstaCargando(true);
         setError(null);
-        // Llamamos a la API real
         const data = await miniatureService.getAllMiniatures();
         setProductos(data);
-      } catch (err) {
-        // Si el servidor está apagado, saltará aquí
+      } catch {
         setError('No se pudo conectar con la forja (Servidor offline)');
       } finally {
         setEstaCargando(false);
       }
     };
-
     obtenerDatos();
-  } , []); // Solo se ejecuta una vez al montar el componente 
+  }, []);
 
-
-
-  // FILTRADO OPTIMIZADO (useMemo)  ACTUAZLIZADO PARA USAR LOS DATOS REALES EN LUGAR DE MOCK
-  // 4. FILTRADO (Ahora usa 'productos' de la API en vez de MOCK)
-
+  // Filtrado: combina categoría + búsqueda. useMemo evita recalcular en
+  // cada re-render que no toque estas tres dependencias.
   const productosFiltrados = useMemo(() => {
-    if (!categoriaSeleccionada) return productos;
-    return productos.filter(item => item.categoria === categoriaSeleccionada);
-  }, [categoriaSeleccionada, productos]); // Añadimos 'productos' a las dependencias
+    let resultado = productos;
+    // 1. FILTRADO POR CATEGORÍA
+      if (categoriaSeleccionada) {
+        if (categoriaSeleccionada === 'Tutorial') {
+          // Si es Tutorial, busca cualquier cosa que contenga esa palabra
+          resultado = resultado.filter(item => 
+            item.categoria && item.categoria.toLowerCase().includes('tutorial')
+          );
+        } else {
+          // Filtro exacto para Fantasía, Bustos, etc.
+          resultado = resultado.filter(item => item.categoria === categoriaSeleccionada);
+        }
+      } 
+      // Si categoriaSeleccionada es null (botón "Todos"), no entra en el if 
+      // y 'resultado' sigue siendo el array completo de 'productos'.
+
+      // 2. FILTRADO POR BÚSQUEDA (Buscador)
+      if (busquedaDebounced.trim()) {
+        const q = busquedaDebounced.trim().toLowerCase();
+        resultado = resultado.filter(
+          item =>
+            item.titulo.toLowerCase().includes(q) ||
+            item.autor.toLowerCase().includes(q)
+        );
+      }
+    
+
+    return resultado;
+  }, [productos, categoriaSeleccionada, busquedaDebounced]);
 
   return {
+    productos,
     productosFiltrados,
     categoriaSeleccionada,
     setCategoriaSeleccionada,
+    busqueda,
+    setBusqueda,
     estaCargando,
-    error   // Lo devolvemos para que App.tsx no de error
+    error,
   };
 };
