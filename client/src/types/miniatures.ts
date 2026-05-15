@@ -4,7 +4,7 @@
 // inferir qué propiedades extra tiene cada variante.
 
 export type Categoria = 'Fantasía' | 'Bustos' | 'Monstruos' | 'Tutorial Pintado' | 
-'Tutorial Esculpido' | 'Tutorial';
+'Tutorial Esculpido' | 'Tutorial' | 'WIPS' | 'Otros'; ;
 
 interface BaseItem {
   id: string;
